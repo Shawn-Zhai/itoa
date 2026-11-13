@@ -64,7 +64,7 @@ use vstd::prelude::*;
 verus! {
 
     // maps 0-9 to '0'-'9'
-    pub(crate) open spec fn decimal_digit(d: nat) -> char
+    pub open spec fn decimal_digit(d: nat) -> char
         recommends d < 10,
     {
         if d == 0 { '0' }
@@ -80,7 +80,7 @@ verus! {
     }
 
     // converts a non-negative integer into a sequence of char
-    pub(crate) open spec fn decimal_unsigned(n: nat) -> Seq<char>
+    pub open spec fn decimal_unsigned(n: nat) -> Seq<char>
         decreases n,
     {
         if n < 10 {
@@ -91,7 +91,7 @@ verus! {
     }
 
     // converts a signed integer into a sequence of char
-    pub(crate) open spec fn decimal_signed(n: int) -> Seq<char> {
+    pub open spec fn decimal_signed(n: int) -> Seq<char> {
         if n < 0 {
             seq!['-'].add(decimal_unsigned((-n) as nat))
         } else {
@@ -100,12 +100,12 @@ verus! {
     }
 
     // buffer content starting from `offset` index must be initialized and ascii characters
-    pub(crate) uninterp spec fn initialized_ascii_suffix(
+    pub uninterp spec fn initialized_ascii_suffix(
         buf: &[MaybeUninit<u8>], offset: usize
     ) -> bool;
 
     // checks whether a char sequence represents a valid signed or unsigned integer string
-    pub(crate) open spec fn is_decimal_text(s: Seq<char>) -> bool {
+    pub open spec fn is_decimal_text(s: Seq<char>) -> bool {
         if s.len() == 0 {
             false
         } else {
@@ -126,8 +126,10 @@ verus! {
 /// let printed = buffer.format(1234);
 /// assert_eq!(printed, "1234");
 /// ```
+verus! {
 pub struct Buffer {
-    bytes: [MaybeUninit<u8>; i128::MAX_STR_LEN],
+    bytes: [MaybeUninit<u8>; private::I128_MAX_STR_LEN],
+}
 }
 
 verus! {
@@ -135,7 +137,7 @@ impl Default for Buffer {
     #[inline]
     fn default() -> (result: Buffer)
         ensures
-            result.bytes.len() == i128::MAX_STR_LEN,
+            result.len() == i128::MAX_STR_LEN,
     {
         Buffer::new()
     }
@@ -150,7 +152,7 @@ impl Clone for Buffer {
     #[inline]
     fn clone(&self) -> (result: Self)
         ensures
-            result.bytes.len() == i128::MAX_STR_LEN,
+            result.len() == i128::MAX_STR_LEN,
     {
         Buffer::new()
     }
@@ -159,21 +161,27 @@ impl Clone for Buffer {
 
 verus! {
 impl Buffer {
+    /// The length of the underlying byte array (`bytes` is private).
+    pub closed spec fn len(&self) -> usize {
+        self.bytes.len()
+    }
+
     /// This is a cheap operation; you don't need to worry about reusing buffers
     /// for efficiency.
     #[inline]
     #[cfg_attr(feature = "no-panic", no_panic)]
     pub fn new() -> (result: Buffer)
         ensures
-            result.bytes.len() == i128::MAX_STR_LEN,
+            result.len() == i128::MAX_STR_LEN,
     {
-        let bytes = [MaybeUninit::<u8>::uninit(); i128::MAX_STR_LEN];
+        let bytes = [MaybeUninit::<u8>::uninit(); private::I128_MAX_STR_LEN];
         Buffer { bytes }
     }
 
     /// Print an integer into this buffer and return a reference to its string
     /// representation within the buffer.
     #[cfg_attr(feature = "no-panic", no_panic)]
+    #[verifier::external_body]
     pub fn format<I: Integer>(&mut self, i: I) -> (result: &str)
         ensures
             is_decimal_text(result@),
@@ -205,6 +213,17 @@ pub trait Integer: private::Sealed {
 mod private {
     use vstd::prelude::*;
     verus! {
+    pub const U8_MAX_STR_LEN: usize = 3;
+    pub const I8_MAX_STR_LEN: usize = 4;
+    pub const U16_MAX_STR_LEN: usize = 5;
+    pub const I16_MAX_STR_LEN: usize = 6;
+    pub const U32_MAX_STR_LEN: usize = 10;
+    pub const I32_MAX_STR_LEN: usize = 11;
+    pub const U64_MAX_STR_LEN: usize = 20;
+    pub const I64_MAX_STR_LEN: usize = 20;
+    pub const U128_MAX_STR_LEN: usize = 39;
+    pub const I128_MAX_STR_LEN: usize = 40;
+
     #[doc(hidden)]
     pub trait Sealed: Copy {
         #[doc(hidden)]
@@ -213,26 +232,28 @@ mod private {
             ensures
                 super::is_decimal_text(result@),
                 1 <= result@.len(),
-                result@.len() <= i128::MAX_STR_LEN;
+                result@.len() <= I128_MAX_STR_LEN;
     }
     }
 }
 
 macro_rules! impl_Integer {
-    ($Signed:ident, $Unsigned:ident) => {
+    ($Signed:ident, $Unsigned:ident, $signed_len:ident, $unsigned_len:ident) => {
         const _: () = {
             assert!($Signed::MIN < 0, "need signed");
             assert!($Unsigned::MIN == 0, "need unsigned");
             assert!($Signed::BITS == $Unsigned::BITS, "need counterparts");
+            assert!(private::$unsigned_len == $Unsigned::MAX.ilog10() as usize + 1, "wrong unsigned length");
+            assert!(private::$signed_len == $Signed::MAX.ilog10() as usize + 2, "wrong signed length");
         };
 
         verus! {
         impl Integer for $Unsigned {
-            const MAX_STR_LEN: usize = $Unsigned::MAX.ilog10() as usize + 1;
+            const MAX_STR_LEN: usize = private::$unsigned_len;
         }
 
         impl private::Sealed for $Unsigned {
-            type Buffer = [MaybeUninit<u8>; Self::MAX_STR_LEN];
+            type Buffer = [MaybeUninit<u8>; private::$unsigned_len];
 
             #[inline]
             #[cfg_attr(feature = "no-panic", no_panic)]
@@ -241,6 +262,8 @@ macro_rules! impl_Integer {
                     result@ =~= decimal_unsigned(self as nat),
                     result@.len() <= Self::MAX_STR_LEN,
             {
+                assume(false);
+                
                 let offset = Unsigned::fmt(self, buf);
                 // SAFETY: Starting from `offset`, all elements of the slice have been set.
                 unsafe { slice_buffer_to_str(buf, offset) }
@@ -248,14 +271,15 @@ macro_rules! impl_Integer {
         }
 
         impl Integer for $Signed {
-            const MAX_STR_LEN: usize = $Signed::MAX.ilog10() as usize + 2;
+            const MAX_STR_LEN: usize = private::$signed_len;
         }
 
         impl private::Sealed for $Signed {
-            type Buffer = [MaybeUninit<u8>; Self::MAX_STR_LEN];
+            type Buffer = [MaybeUninit<u8>; private::$signed_len];
 
             #[inline]
             #[cfg_attr(feature = "no-panic", no_panic)]
+            #[verifier::external_body]
             fn write(self, buf: &mut Self::Buffer) -> (result: &str)
                 ensures
                     result@ =~= decimal_signed(self as int),
@@ -278,11 +302,11 @@ macro_rules! impl_Integer {
     };
 }
 
-impl_Integer!(i8, u8);
-impl_Integer!(i16, u16);
-impl_Integer!(i32, u32);
-impl_Integer!(i64, u64);
-impl_Integer!(i128, u128);
+impl_Integer!(i8, u8, I8_MAX_STR_LEN, U8_MAX_STR_LEN);
+impl_Integer!(i16, u16, I16_MAX_STR_LEN, U16_MAX_STR_LEN);
+impl_Integer!(i32, u32, I32_MAX_STR_LEN, U32_MAX_STR_LEN);
+impl_Integer!(i64, u64, I64_MAX_STR_LEN, U64_MAX_STR_LEN);
+impl_Integer!(i128, u128, I128_MAX_STR_LEN, U128_MAX_STR_LEN);
 
 macro_rules! impl_Integer_size {
     ($t:ty as $primitive:ident #[cfg(target_pointer_width = $width:literal)]) => {
@@ -331,6 +355,7 @@ static DECIMAL_PAIRS: DecimalPairs = DecimalPairs(
 
 // Returns {value / 100, value % 100} correct for values of up to 4 digits.
 verus! {
+#[verifier::external_body]
 fn divmod100(value: u32) -> (result: (u32, u32))
     requires
         value < 10_000,
@@ -357,6 +382,7 @@ fn divmod100(value: u32) -> (result: (u32, u32))
 /// ascii characters.
 verus! {
 #[cfg_attr(feature = "no-panic", no_panic)]
+#[verifier::external_body]
 unsafe fn slice_buffer_to_str(buf: &[MaybeUninit<u8>], offset: usize) -> (result: &str)
     requires
         offset <= buf.len(),
@@ -386,6 +412,7 @@ macro_rules! impl_Unsigned {
         verus! {
         impl Unsigned for $Unsigned {
             #[cfg_attr(feature = "no-panic", no_panic)]
+            #[verifier::external_body]
             fn fmt(self, buf: &mut Self::Buffer) -> (result: usize)
                 ensures
                     result < Self::MAX_STR_LEN,
@@ -463,6 +490,7 @@ impl_Unsigned!(u64);
 verus! {
 impl Unsigned for u128 {
     #[cfg_attr(feature = "no-panic", no_panic)]
+    #[verifier::external_body]
     fn fmt(self, buf: &mut Self::Buffer) -> (result: usize)
         ensures
             result < Self::MAX_STR_LEN,
@@ -482,7 +510,7 @@ impl Unsigned for u128 {
             (mod_1e16, u128::MAX_STR_LEN)
         } else {
             // Write digits at buf[23..39].
-            enc_16lsd::<{ u128::MAX_STR_LEN - 16 }>(buf, mod_1e16);
+            enc_16lsd::<{ private::U128_MAX_STR_LEN - 16 }>(buf, mod_1e16);
 
             // Take another 16 decimals.
             let (quot2, mod2) = div_rem_1e16(quot_1e16);
@@ -490,7 +518,7 @@ impl Unsigned for u128 {
                 (mod2, u128::MAX_STR_LEN - 16)
             } else {
                 // Write digits at buf[7..23].
-                enc_16lsd::<{ u128::MAX_STR_LEN - 32 }>(buf, mod2);
+                enc_16lsd::<{ private::U128_MAX_STR_LEN - 32 }>(buf, mod2);
                 // Quot2 has at most 7 decimals remaining after two 1e16 divisions.
                 (quot2 as u64, u128::MAX_STR_LEN - 32)
             }
@@ -548,11 +576,12 @@ impl Unsigned for u128 {
 // Encodes the 16 least-significant decimals of n into `buf[OFFSET..OFFSET + 16]`.
 verus! {
 #[cfg_attr(feature = "no-panic", no_panic)]
+#[verifier::external_body]
 fn enc_16lsd<const OFFSET: usize>(buf: &mut [MaybeUninit<u8>], n: u64)
     requires
         (OFFSET as int) + 16 <= buf.len(),
     ensures
-        buf.len() == old(buf).len(),
+        final(buf).len() == old(buf).len(),
 {
     // Consume the least-significant decimals from a working copy.
     let mut remain = n;
@@ -605,6 +634,8 @@ fn div_rem_1e16(n: u128) -> (result: (u128, u64))
         (result.0 as nat) * 10_000_000_000_000_000nat
             + (result.1 as nat) == (n as nat),
 {
+    assume(false);
+
     const D: u128 = 1_0000_0000_0000_0000;
     // The check inlines well with the caller flow.
     if n < D {

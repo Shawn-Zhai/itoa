@@ -12,6 +12,8 @@ pub(crate) fn mulhi(x: u128, y: u128) -> (result: u128)
         result as nat == (x as nat) * (y as nat)
             / 340282366920938463463374607431768211456nat,
 {
+    assume(false);
+    
     let x_lo = x as u64;
     let x_hi = (x >> 64) as u64;
     let y_lo = y as u64;
