@@ -1,0 +1,1545 @@
+# Hand edits in verus_fixed/ relative to verus/ (2026-11-13). Generated files (upstream.diff) and the reports
+# (VERIFICATION.md, rewritten; SPEC_REVIEW.md, new) are left out.
+
+diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/check_trusted.py verus_fixed/check_trusted.py
+--- verus/check_trusted.py	2026-11-09 22:44:17.627634327 -0500
++++ verus_fixed/check_trusted.py	2026-11-13 02:17:49.809491777 -0500
+@@ -1,9 +1,16 @@
+ #!/usr/bin/env python3
+-"""Check that itoa/src/trusted.rs is upstream code: each of its items must appear verbatim in
+-upstream ../src/lib.rs, except the `write` method for signed types inside `impl_Integer!`, the one
+-expected change (its formatting logic moved to the verified `Signed::fmt`). Prints the diff of
+-that change. Usage: python3 check_trusted.py (from verus/)."""
+-import difflib
++"""Check that the trusted code in itoa/src/trusted.rs is upstream's code (../src/lib.rs), and that
++the shells around it, now verified, keep upstream's statements.
++
++- T3 `slice_buffer_to_str`: the body is upstream's body, verbatim.
++- T1 `buffer_of`: the body is upstream's cast from `Buffer::format`, with `self.bytes` passed in
++  as `bytes`.
++- `Buffer::format` (verified): upstream's body, with the cast replaced by a call to `buffer_of`.
++- The `write` methods (verified): upstream's bodies, except the signed `write`, whose formatting
++  moved into the verified `Signed::fmt` in Claude's first pass.
++
++Ghost code (`proof { ... }` blocks) and comments are ignored. Usage: python3 check_trusted.py
++(from verus_fixed/)."""
+ import os
+ import re
+ import sys
+@@ -11,57 +18,74 @@
+ HERE = os.path.dirname(os.path.abspath(__file__))
+ UPSTREAM = open(os.path.join(HERE, '..', 'src', 'lib.rs')).read()
+ TRUSTED = open(os.path.join(HERE, 'itoa', 'src', 'trusted.rs')).read()
++LIB = open(os.path.join(HERE, 'itoa', 'src', 'lib.rs')).read()
+ 
+ 
+-def items(text):
+-    """Top-level items (with their doc comments and attributes) after the module header."""
+-    body = text[text.index('// ===== T1 =====') :]
+-    lines = [l for l in body.split('\n') if not l.startswith('// =====')]
+-    out, cur = [], []
+-    for line in lines:
+-        cur.append(line)
+-        # An item ends at a closing brace or semicolon in column 0.
+-        if line in ('}', '};') or (line.endswith(';') and not line.startswith(' ')):
+-            out.append('\n'.join(cur).strip('\n'))
+-            cur = []
+-    return [i for i in out if i.strip()]
+-
+-
+-def unindent_impl_method(item):
+-    """`impl Buffer { <method> }` in trusted.rs is one method of upstream's `impl Buffer`."""
+-    m = re.match(r'impl Buffer \{\n(.*)\n\}$', item, re.S)
+-    return m.group(1) if m else item
++def body(text, signature, nth=0):
++    """Statements of the body of the `nth` function whose header contains `signature`
++    (declarations without a body, such as trait methods, are skipped)."""
++    def has_body(s):
++        depth = 0  # parentheses and brackets; a `;` inside them (array types) does not end the item
++        for c in text[s:]:
++            depth += {'(': 1, '[': 1, ')': -1, ']': -1}.get(c, 0)
++            if depth == 0 and c in '{;':
++                return c == '{'
++    starts = [m.start() for m in re.finditer(re.escape(signature), text)]
++    start = [s for s in starts if has_body(s)][nth]
++    i = text.index('{', start)
++    depth, j = 0, i
++    while True:
++        depth += {'{': 1, '}': -1}.get(text[j], 0)
++        if depth == 0:
++            break
++        j += 1
++    src = text[i + 1:j]
++    src = re.sub(r'proof \{.*?\n\s*\}\n', '', src, flags=re.S)  # ghost blocks
++    lines = [re.sub(r'\s*//.*$', '', l).strip() for l in src.split('\n')]
++    return [l for l in lines if l]
+ 
+ 
+ failures = 0
+-for item in items(TRUSTED):
+-    probe = unindent_impl_method(item)
+-    head = probe.strip().split('\n')[0]
+-    name = re.search(r'(fn \w+|macro_rules! \w+|impl_Integer\w*!\([^)]*\))', probe)
+-    label = name.group(1) if name else head
+-    if probe in UPSTREAM:
+-        print(f'verbatim            {label}')
+-    elif label == 'macro_rules! impl_Integer':
+-        up = re.search(r'macro_rules! impl_Integer \{.*?\n\}', UPSTREAM, re.S).group(0)
+-        diff = list(difflib.unified_diff(up.split('\n'), probe.split('\n'), 'upstream', 'trusted.rs',
+-                                         lineterm='', n=1))
+-        changed = [l for l in diff if l[:1] in '+-' and l[:3] not in ('+++', '---')]
+-        removed = [l[1:].strip() for l in changed if l.startswith('-') and l[1:].strip()]
+-        expected_removed = {
+-            'let mut offset = Self::MAX_STR_LEN - $Unsigned::MAX_STR_LEN;',
+-            'offset += Unsigned::fmt(', 'self.unsigned_abs(),',
+-            '(&mut buf[offset..]).try_into().unwrap(),', ');', 'if self < 0 {', 'offset -= 1;',
+-            "unsafe { buf.get_unchecked_mut(offset).write(b'-') };", '}',
+-        }
+-        if set(removed) <= expected_removed:
+-            print(f'changed (expected)  {label}: signed `write` calls the verified `Signed::fmt`')
+-            print('\n'.join('    ' + l for l in diff))
+-        else:
+-            failures += 1
+-            print(f'CHANGED             {label}')
+-            print('\n'.join('    ' + l for l in diff))
+-    else:
++
++
++def check(label, ok, got, want):
++    global failures
++    print(f'{"ok      " if ok else "CHANGED "} {label}')
++    if not ok:
+         failures += 1
+-        print(f'CHANGED             {label}')
+-print(f'{len(items(TRUSTED))} items, {failures} unexpected changes')
++        print('    got: ', got)
++        print('    want:', want)
++
++
++up_format = body(UPSTREAM, 'pub fn format<I: Integer>')
++up_slice = body(UPSTREAM, 'unsafe fn slice_buffer_to_str')
++up_write_unsigned = body(UPSTREAM, 'fn write(self, buf: &mut Self::Buffer) -> &str', 0)
++up_write_size = body(UPSTREAM, 'fn write(self, buf: &mut Self::Buffer) -> &str', 2)
++
++# T3: verbatim.
++got = body(TRUSTED, 'unsafe fn slice_buffer_to_str')
++check('T3 slice_buffer_to_str: upstream body, verbatim', got == up_slice, got, up_slice)
++
++# T1: the cast of upstream's `format`.
++got = body(TRUSTED, 'fn buffer_of<I: Integer>')
++want = [up_format[0].replace('self.bytes', 'bytes'), 'unsafe { &mut *buf_ptr }']
++ok = got == want and 'unsafe { &mut *buf_ptr }' in up_format[1]
++check("T1 buffer_of: upstream's cast from Buffer::format", ok, got, want)
++
++# Verified `format`: upstream's statements, with the cast replaced by `buffer_of`.
++got = body(LIB, 'pub fn format<I: Integer>')
++want = [up_format[1].replace('unsafe { &mut *buf_ptr }', 'buffer_of::<I>(&mut self.bytes)')] + up_format[2:]
++check('Buffer::format (verified): upstream body, the cast moved to buffer_of', got == want, got, want)
++
++# Verified `write` methods.
++got = body(LIB, 'fn write(self, buf: &mut Self::Buffer) -> (result: &str)', 0)
++check('unsigned write (verified): upstream body', got == up_write_unsigned, got, up_write_unsigned)
++got = body(LIB, 'fn write(self, buf: &mut Self::Buffer) -> (result: &str)', 1)
++want = ['let offset = Signed::fmt(self, buf);', up_write_unsigned[-1]]
++check('signed write (verified): calls Signed::fmt (Claude, first pass), then upstream tail', got == want, got,
++      want)
++got = body(LIB, 'fn write(self, buf: &mut Self::Buffer) -> (result: &str)', 2)
++check('usize/isize write (verified): upstream body', got == up_write_size, got, up_write_size)
++
++print(f'{failures} unexpected changes')
+ sys.exit(1 if failures else 0)
+diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/README.md verus_fixed/itoa/README.md
+--- verus/itoa/README.md	2026-11-09 22:45:59.500055849 -0500
++++ verus_fixed/itoa/README.md	2026-11-13 02:23:14.162946104 -0500
+@@ -1,32 +1,43 @@
+-# `itoa` annotated for Verus
++# `itoa` annotated for Verus (amended)
+ 
+ `src/` is itoa `master` (9339ca9, v1.0.19) with Verus specifications and proofs added in place.
+-Results, the specification, the trusted base and the audited list of code changes are in
+-[`../VERIFICATION.md`](../VERIFICATION.md); the full diff against upstream is
+-[`../upstream.diff`](../upstream.diff).
+-
+-- `src/lib.rs`, `src/u128_ext.rs`: upstream code, verified (inside `verus! { ... }` blocks):
+-  all the digit generation (`Unsigned::fmt` for `u8`..`u128`, `enc_16lsd`, `div_rem_1e16`,
+-  `mulhi`, `divmod100`, the `DECIMAL_PAIRS` table), the signed formatting (`Signed::fmt`) and
+-  `Buffer::new`/`Default`/`Clone`.
+-- `src/trusted.rs`: upstream code that is trusted, not verified. Verus skips the module
+-  (`#[verifier::external]` on its declaration). It holds the two raw-pointer reinterpretations
+-  (`Buffer::format`, `slice_buffer_to_str`) and the `Integer`/`Sealed` impls whose `write` calls them.
+-- `src/spec.rs`: the specification (`dec`, `dec_int`, `holds`, ...) and the lemmas. Ghost code only;
+-  nothing in it is trusted.
++This is the amended version of `../../verus/itoa`, after the review against the developer-written
++spec. The review is in [`../SPEC_REVIEW.md`](../SPEC_REVIEW.md). Results, the specification, the
++trusted base and the audited list of code changes are in [`../VERIFICATION.md`](../VERIFICATION.md).
++The full diff against upstream is [`../upstream.diff`](../upstream.diff).
++
++- `src/lib.rs`, `src/u128_ext.rs`: upstream code, verified (inside `verus! { ... }` blocks).
++  - The public API: `Buffer::format`, `Buffer::new`/`Default`/`Clone`, and the `Integer`/`Sealed`
++    impls with `write` for all 12 integer types.
++  - All the digit generation: `Unsigned::fmt` for `u8`..`u128`, `enc_16lsd`, `div_rem_1e16`, `mulhi`,
++    `divmod100`, the `DECIMAL_PAIRS` table.
++  - The signed formatting (`Signed::fmt`).
++  - The developer's contracts are stated next to Claude's (marked `// Human spec`).
++- `src/trusted.rs`: the trusted code. Two `#[verifier::external_body]` functions with explicit
++  contracts: `buffer_of` (the raw-pointer cast of `Buffer::format`) and `slice_buffer_to_str`.
++- `src/spec.rs`: Claude's specification (`dec`, `dec_int`, `holds`, ...) and its lemmas.
++- `src/human_spec.rs`: the developer's spec functions (`decimal_unsigned`, `decimal_signed`,
++  `is_decimal_text`, ...), transcribed.
++- `src/spec_equiv.rs`: lemmas showing that the two specifications describe the same text.
++- `src/verified_examples.rs`: verified clients of `Buffer::format` (compiled only under Verus).
+ - `src/std_ext.rs`: verified stand-ins for `<[T]>::get_unchecked` and
+   `<[T]>::get_unchecked_mut(..).write(..)`, which vstd does not specify.
+ - `tests/`, `benches/`: unchanged from upstream.
+ 
++`spec.rs`, `human_spec.rs`, `spec_equiv.rs` and `verified_examples.rs` are ghost code only:
++normal builds erase them, and nothing in them is trusted.
++
+ Scripts in `../`:
+ - `negative_controls.py`: injected bugs that Verus must reject.
+-- `check_trusted.py`: `src/trusted.rs` is verbatim upstream, except the one expected change.
++- `check_trusted.py`: the trusted bodies are upstream code, and the verified shells keep upstream's
++  statements.
+ 
+ ## Reproduce
+ 
+ Verus 0.2026.05.03.8b81855 (the bare `verus` binary with its bundled vstd). Run from this directory:
+ 
+-    verus --crate-type=lib --no-cheating src/lib.rs        # 105 verified, 0 errors
++    verus --crate-type=lib src/lib.rs                  # 165 verified, 0 errors
++    verus --crate-type=lib --no-cheating src/lib.rs    # reports exactly the 2 trusted items
+ 
+ Normal build and the upstream tests (ghost code erased; toolchain pinned to 1.95.0 by
+ `rust-toolchain.toml`):
+diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/src/human_spec.rs verus_fixed/itoa/src/human_spec.rs
+--- verus/itoa/src/human_spec.rs	1969-12-31 19:00:00.000000000 -0500
++++ verus_fixed/itoa/src/human_spec.rs	2026-11-13 01:49:04.108159989 -0500
+@@ -0,0 +1,88 @@
++//! The developer-written specification (`verus_human_written_spec/itoa/src/lib.rs`), transcribed.
++//!
++//! Ghost code only: `verus!` erases all of it from normal builds. The spec functions below are
++//! the developer's, unchanged, with one exception: `initialized_ascii_suffix` was `uninterp`, so
++//! no caller could ever establish the precondition of `slice_buffer_to_str`. Here it has the
++//! meaning that its comment and the `# Safety` section of `slice_buffer_to_str` give it.
++//!
++//! The developer's contracts are stated in `lib.rs` and `u128_ext.rs`, on the functions they
++//! belong to, next to Claude's contracts; each such clause is marked `// Human spec`.
++//! `spec_equiv.rs` relates these definitions to Claude's (`spec.rs`).
++
++#![allow(unused_imports)]
++use core::mem::MaybeUninit;
++use vstd::prelude::*;
++
++verus! {
++
++// maps 0-9 to '0'-'9'
++pub open spec fn decimal_digit(d: nat) -> char
++    recommends
++        d < 10,
++{
++    if d == 0 {
++        '0'
++    } else if d == 1 {
++        '1'
++    } else if d == 2 {
++        '2'
++    } else if d == 3 {
++        '3'
++    } else if d == 4 {
++        '4'
++    } else if d == 5 {
++        '5'
++    } else if d == 6 {
++        '6'
++    } else if d == 7 {
++        '7'
++    } else if d == 8 {
++        '8'
++    } else {
++        '9'
++    }
++}
++
++// converts a non-negative integer into a sequence of char
++pub open spec fn decimal_unsigned(n: nat) -> Seq<char>
++    decreases n,
++{
++    if n < 10 {
++        Seq::empty().push(decimal_digit(n))
++    } else {
++        decimal_unsigned(n / 10).push(decimal_digit(n % 10))
++    }
++}
++
++// converts a signed integer into a sequence of char
++pub open spec fn decimal_signed(n: int) -> Seq<char> {
++    if n < 0 {
++        seq!['-'].add(decimal_unsigned((-n) as nat))
++    } else {
++        decimal_unsigned(n as nat)
++    }
++}
++
++// buffer content starting from `offset` index must be initialized and ascii characters
++//
++// (The developer declared this `uninterp`. Defined here: each element from `offset` on holds an
++// initialized byte below 128.)
++pub open spec fn initialized_ascii_suffix(buf: &[MaybeUninit<u8>], offset: usize) -> bool {
++    forall|i: int|
++        offset <= i < buf@.len() ==> {
++            &&& (#[trigger] buf@[i]).mem_contents().is_init()
++            &&& buf@[i].mem_contents().value() < 128
++        }
++}
++
++// checks whether a char sequence represents a valid signed or unsigned integer string
++pub open spec fn is_decimal_text(s: Seq<char>) -> bool {
++    if s.len() == 0 {
++        false
++    } else {
++        (s[0] != '-' || s.len() > 1) && (forall|k: int|
++            0 <= k < s.len() ==> (s[k] >= '0' && s[k] <= '9') || (k == 0 && s[k] == '-'))
++    }
++}
++
++} // verus!
+diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/src/lib.rs verus_fixed/itoa/src/lib.rs
+--- verus/itoa/src/lib.rs	2026-11-09 22:58:18.249458381 -0500
++++ verus_fixed/itoa/src/lib.rs	2026-11-13 02:25:20.891679428 -0500
+@@ -50,21 +50,47 @@
+     clippy::needless_doctest_main,
+     clippy::unreadable_literal
+ )]
++// Lints that only the Verus annotations trigger: erased `proof` blocks at the end of a block
++// (`semicolon_if_nothing_returned`), the `#[inline(always)]` stand-ins (`inline_always`), the
++// annotated `u128::fmt` (`too_many_lines`), and `ref_as_ptr`, which clippy applies to upstream's
++// `slice_buffer_to_str` once `rust-version` is 1.76 or later (upstream: 1.68).
++#![allow(
++    clippy::inline_always,
++    clippy::ref_as_ptr,
++    clippy::semicolon_if_nothing_returned,
++    clippy::too_many_lines
++)]
+ 
++// The developer's specification, transcribed (ghost code only).
++mod human_spec;
+ mod spec;
++// Lemmas relating Claude's specification to the developer's (ghost code only).
++mod spec_equiv;
+ mod std_ext;
+-// The code that is trusted rather than verified. Verus skips this module.
+-#[cfg_attr(verus_keep_ghost, verifier::external)]
++// The code that is trusted rather than verified: two `external_body` functions.
+ mod trusted;
+ mod u128_ext;
++// Verified clients of `Buffer::format` (only compiled under Verus).
++#[cfg(verus_keep_ghost)]
++mod verified_examples;
+ 
++// The developer's spec functions (`decimal_signed`, `is_decimal_text`, ...) are at the crate root
++// in their file; so they are here, for Verus clients. (Ghost code: nothing in normal builds.)
++#[cfg(verus_keep_ghost)]
++pub use crate::human_spec::*;
+ #[cfg(verus_keep_ghost)]
+ use crate::spec::*;
++#[cfg(verus_keep_ghost)]
++use crate::spec_equiv::*;
+ use crate::std_ext::{get_unchecked, write_unchecked};
++use crate::trusted::{buffer_of, slice_buffer_to_str};
++use core::hint;
+ use core::mem::{self, MaybeUninit};
+ #[cfg(feature = "no-panic")]
+ use no_panic::no_panic;
+ use vstd::prelude::*;
++#[cfg(verus_keep_ghost)]
++use vstd::utf8::is_ascii_chars_encode_utf8;
+ 
+ verus! {
+ 
+@@ -79,12 +105,18 @@
+ /// assert_eq!(printed, "1234");
+ /// ```
+ pub struct Buffer {
+-    bytes: [MaybeUninit<u8>; i128::MAX_STR_LEN],
++    // (Upstream: `i128::MAX_STR_LEN`, the same constant. Verus crashes on an associated constant
++    // used as an array length, so array lengths use the plain constants of `private`.)
++    bytes: [MaybeUninit<u8>; private::I128_MAX_STR_LEN],
+ }
+ 
+ impl Default for Buffer {
+     #[inline]
+-    fn default() -> Buffer {
++    fn default() -> (result: Buffer)
++        ensures
++            // Human spec
++            result.len() == i128::MAX_STR_LEN,
++    {
+         Buffer::new()
+     }
+ }
+@@ -94,21 +126,59 @@
+ #[allow(clippy::non_canonical_clone_impl)]
+ impl Clone for Buffer {
+     #[inline]
+-    fn clone(&self) -> Self {
++    fn clone(&self) -> (result: Self)
++        ensures
++            // Human spec
++            result.len() == i128::MAX_STR_LEN,
++    {
+         Buffer::new()
+     }
+ }
+ 
+ impl Buffer {
++    /// The length of the underlying byte array (`bytes` is private). (From the developer's spec.)
++    pub closed spec fn len(&self) -> usize {
++        self.bytes.len()
++    }
++
+     /// This is a cheap operation; you don't need to worry about reusing buffers
+     /// for efficiency.
+     #[inline]
+     #[cfg_attr(feature = "no-panic", no_panic)]
+-    pub fn new() -> Buffer {
+-        let bytes = [MaybeUninit::<u8>::uninit(); i128::MAX_STR_LEN];
++    pub fn new() -> (result: Buffer)
++        ensures
++            // Human spec
++            result.len() == i128::MAX_STR_LEN,
++    {
++        let bytes = [MaybeUninit::<u8>::uninit(); private::I128_MAX_STR_LEN];
+         Buffer { bytes }
+     }
+-    // `Buffer::format` is in `trusted.rs`.
++
++    /// Print an integer into this buffer and return a reference to its string
++    /// representation within the buffer.
++    #[cfg_attr(feature = "no-panic", no_panic)]
++    pub fn format<I: Integer>(&mut self, i: I) -> (result: &str)
++        ensures
++            // The decimal representation of `i`.
++            result@ == decimal_signed(i.spec_int()),
++            // Human spec
++            is_decimal_text(result@),
++            1 <= result@.len(),
++            result@.len() <= I::MAX_STR_LEN,
++    {
++        // (Upstream: `let buf_ptr = self.bytes.as_mut_ptr().cast::<I::Buffer>();` and
++        // `i.write(unsafe { &mut *buf_ptr })`. The cast is the trusted `buffer_of`.)
++        let string = i.write(buffer_of::<I>(&mut self.bytes));
++        proof {
++            i.lemma_max_str_len();
++            lemma_dec_int_text(i.spec_int());
++            is_ascii_chars_encode_utf8(string@);
++        }
++        if string.len() > I::MAX_STR_LEN {
++            unsafe { hint::unreachable_unchecked() };
++        }
++        string
++    }
+ }
+ 
+ /// An integer that can be written into an [`itoa::Buffer`][Buffer].
+@@ -118,23 +188,209 @@
+     /// The maximum length of string that formatting an integer of this type can
+     /// produce on the current target platform.
+     const MAX_STR_LEN: usize;
++
++    /// Every value of the type fits in `MAX_STR_LEN` bytes, and `MAX_STR_LEN` fits in a
++    /// `Buffer`. (The `lemma_max_str_len_*` lemmas below also show that `MAX_STR_LEN` is the
++    /// length of the longest decimal representation, as documented.)
++    proof fn lemma_max_str_len(self)
++        ensures
++            decimal_signed(self.spec_int()).len() <= Self::MAX_STR_LEN,
++            Self::MAX_STR_LEN <= private::I128_MAX_STR_LEN,
++    ;
+ }
+ 
+ // Seal to prevent downstream implementations of the Integer trait.
+ mod private {
++    #[cfg(verus_keep_ghost)]
++    use crate::human_spec::*;
++    #[cfg(verus_keep_ghost)]
++    use vstd::prelude::*;
++
++    // `MAX_STR_LEN` of each type, as a plain constant: Verus crashes on an associated constant
++    // used as an array length (see `SPEC_REVIEW.md`). `impl_Integer!` checks each one against
++    // upstream's definition (`MAX.ilog10() + 1`, or `+ 2` for the signed types) at compile time.
++    pub const U8_MAX_STR_LEN: usize = 3;
++    pub const I8_MAX_STR_LEN: usize = 4;
++    pub const U16_MAX_STR_LEN: usize = 5;
++    pub const I16_MAX_STR_LEN: usize = 6;
++    pub const U32_MAX_STR_LEN: usize = 10;
++    pub const I32_MAX_STR_LEN: usize = 11;
++    pub const U64_MAX_STR_LEN: usize = 20;
++    pub const I64_MAX_STR_LEN: usize = 20;
++    pub const U128_MAX_STR_LEN: usize = 39;
++    pub const I128_MAX_STR_LEN: usize = 40;
++
+     #[doc(hidden)]
+     pub trait Sealed: Copy {
+         #[doc(hidden)]
+         type Buffer: 'static;
+-        fn write(self, buf: &mut Self::Buffer) -> &str;
++
++        /// The value of `self`.
++        spec fn spec_int(self) -> int;
++
++        fn write(self, buf: &mut Self::Buffer) -> (result: &str)
++            ensures
++                // The decimal representation of `self`.
++                result@ == decimal_signed(self.spec_int()),
++                // Human spec
++                is_decimal_text(result@),
++                1 <= result@.len(),
++                result@.len() <= I128_MAX_STR_LEN,
++        ;
+     }
+ }
+ 
+ } // verus!
+ 
+-// The impls of `Integer` and `private::Sealed` (macros `impl_Integer!` and
+-// `impl_Integer_size!`) are in `trusted.rs`. Their `write` methods call the
+-// verified `Unsigned::fmt` and `Signed::fmt` below.
++macro_rules! impl_Integer {
++    ($Signed:ident, $Unsigned:ident, $signed_len:ident, $unsigned_len:ident, $signed_lemma:ident, $unsigned_lemma:ident) => {
++        const _: () = {
++            assert!($Signed::MIN < 0, "need signed");
++            assert!($Unsigned::MIN == 0, "need unsigned");
++            assert!($Signed::BITS == $Unsigned::BITS, "need counterparts");
++            // The lengths are plain constants (see `private`); upstream's definitions:
++            assert!(private::$unsigned_len == $Unsigned::MAX.ilog10() as usize + 1, "wrong unsigned length");
++            assert!(private::$signed_len == $Signed::MAX.ilog10() as usize + 2, "wrong signed length");
++        };
++
++        verus! {
++
++        impl Integer for $Unsigned {
++            const MAX_STR_LEN: usize = private::$unsigned_len;
++
++            proof fn lemma_max_str_len(self) {
++                $unsigned_lemma();
++                lemma_dec_int_text(self as int);
++            }
++        }
++
++        impl private::Sealed for $Unsigned {
++            type Buffer = [MaybeUninit<u8>; private::$unsigned_len];
++
++            open spec fn spec_int(self) -> int {
++                self as int
++            }
++
++            #[inline]
++            #[cfg_attr(feature = "no-panic", no_panic)]
++            fn write(self, buf: &mut Self::Buffer) -> (result: &str)
++                ensures
++                    // Human spec
++                    result@ =~= decimal_unsigned(self as nat),
++                    result@.len() <= Self::MAX_STR_LEN,
++            {
++                proof {
++                    $unsigned_lemma();
++                    lemma_dec_int_text(self as int);
++                    lemma_str_of_dec_int(self as int);
++                }
++                let offset = Unsigned::fmt(self, buf);
++                proof {
++                    lemma_holds_suffix(buf@, offset as int, dec(self as nat));
++                }
++                // SAFETY: Starting from `offset`, all elements of the slice have been set.
++                unsafe { slice_buffer_to_str(buf, offset) }
++            }
++        }
++
++        impl Integer for $Signed {
++            const MAX_STR_LEN: usize = private::$signed_len;
++
++            proof fn lemma_max_str_len(self) {
++                $signed_lemma();
++                lemma_dec_int_text(self as int);
++            }
++        }
++
++        impl private::Sealed for $Signed {
++            type Buffer = [MaybeUninit<u8>; private::$signed_len];
++
++            open spec fn spec_int(self) -> int {
++                self as int
++            }
++
++            #[inline]
++            #[cfg_attr(feature = "no-panic", no_panic)]
++            fn write(self, buf: &mut Self::Buffer) -> (result: &str)
++                ensures
++                    // Human spec
++                    result@ =~= decimal_signed(self as int),
++                    result@.len() <= Self::MAX_STR_LEN,
++            {
++                proof {
++                    $signed_lemma();
++                    lemma_dec_int_text(self as int);
++                    lemma_str_of_dec_int(self as int);
++                }
++                // The formatting (upstream's body of this method, up to here) is in the
++                // verified `Signed::fmt`.
++                let offset = Signed::fmt(self, buf);
++                proof {
++                    lemma_holds_suffix(buf@, offset as int, dec_int(self as int));
++                }
++                // SAFETY: Starting from `offset`, all elements of the slice have been set.
++                unsafe { slice_buffer_to_str(buf, offset) }
++            }
++        }
++
++        } // verus!
++    };
++}
++
++impl_Integer!(i8, u8, I8_MAX_STR_LEN, U8_MAX_STR_LEN, lemma_max_str_len_i8, lemma_max_str_len_u8);
++impl_Integer!(i16, u16, I16_MAX_STR_LEN, U16_MAX_STR_LEN, lemma_max_str_len_i16, lemma_max_str_len_u16);
++impl_Integer!(i32, u32, I32_MAX_STR_LEN, U32_MAX_STR_LEN, lemma_max_str_len_i32, lemma_max_str_len_u32);
++impl_Integer!(i64, u64, I64_MAX_STR_LEN, U64_MAX_STR_LEN, lemma_max_str_len_i64, lemma_max_str_len_u64);
++impl_Integer!(i128, u128, I128_MAX_STR_LEN, U128_MAX_STR_LEN, lemma_max_str_len_i128, lemma_max_str_len_u128);
++
++macro_rules! impl_Integer_size {
++    ($t:ty as $primitive:ident, $len:ident #[cfg(target_pointer_width = $width:literal)]) => {
++        verus! {
++
++        #[cfg(target_pointer_width = $width)]
++        impl Integer for $t {
++            // (Upstream: `<$primitive as Integer>::MAX_STR_LEN`, which is `private::$len`. Defined
++            // through the projection, it stops Verus from unfolding the spec functions of the
++            // impls for `$primitive`; see `SPEC_REVIEW.md`.)
++            const MAX_STR_LEN: usize = private::$len;
++
++            proof fn lemma_max_str_len(self) {
++                // Upstream's definition.
++                assert(Self::MAX_STR_LEN == <$primitive as Integer>::MAX_STR_LEN);
++                (self as $primitive).lemma_max_str_len();
++            }
++        }
++
++        #[cfg(target_pointer_width = $width)]
++        impl private::Sealed for $t {
++            type Buffer = <$primitive as private::Sealed>::Buffer;
++
++            open spec fn spec_int(self) -> int {
++                self as int
++            }
++
++            #[inline]
++            #[cfg_attr(feature = "no-panic", no_panic)]
++            fn write(self, buf: &mut Self::Buffer) -> (result: &str)
++                ensures
++                    // Human spec
++                    result@ =~= decimal_signed(self as int),
++                    result@.len() <= Self::MAX_STR_LEN,
++            {
++                (self as $primitive).write(buf)
++            }
++        }
++
++        } // verus!
++    };
++}
++
++impl_Integer_size!(isize as i16, I16_MAX_STR_LEN #[cfg(target_pointer_width = "16")]);
++impl_Integer_size!(usize as u16, U16_MAX_STR_LEN #[cfg(target_pointer_width = "16")]);
++impl_Integer_size!(isize as i32, I32_MAX_STR_LEN #[cfg(target_pointer_width = "32")]);
++impl_Integer_size!(usize as u32, U32_MAX_STR_LEN #[cfg(target_pointer_width = "32")]);
++impl_Integer_size!(isize as i64, I64_MAX_STR_LEN #[cfg(target_pointer_width = "64")]);
++impl_Integer_size!(usize as u64, U64_MAX_STR_LEN #[cfg(target_pointer_width = "64")]);
+ 
+ verus! {
+ 
+@@ -169,6 +425,9 @@
+     ensures
+         r.0 == value / 100,
+         r.1 == value % 100,
++        // Human spec
++        r.1 < 100,
++        (r.0 as nat) * 100 + r.1 as nat == value as nat,
+ {
+     const EXP: u32 = 19; // 19 is faster or equal to 12 even for 3 digits.
+     const SIG: u32 = (1 << EXP) / 100 + 1;
+@@ -219,6 +478,9 @@
+             offset + dec(self.spec_val()).len() == N,
+             holds(final(buf)@, offset as int, dec(self.spec_val())),
+             unchanged_outside(final(buf)@, old(buf)@, offset as int, N as int),
++            // Human spec (stated there for `buf: &mut Self::Buffer`, that is `N == Self::MAX_STR_LEN`)
++            offset < N,
++            N - offset == decimal_unsigned(self.spec_val()).len(),
+     ;
+ }
+ 
+@@ -235,6 +497,7 @@
+                 let ghost v = self as nat;
+                 proof {
+                     lemma_digits_start(v, N as nat, buf@);
++                    lemma_dec_len_human(v);
+                 }
+                 // Count the number of bytes in buf that are not initialized.
+                 let mut offset = buf.len();
+@@ -362,6 +625,7 @@
+         let ghost v = self as nat;
+         proof {
+             lemma_digits_start(v, N as nat, buf@);
++            lemma_dec_len_human(v);
+         }
+         // Optimize common-case zero, which would also need special treatment due to
+         // its "leading" zero.
+@@ -653,6 +917,8 @@
+         final(buf)@.len() == old(buf)@.len(),
+         holds(final(buf)@, offset as int, dec_pad(n as nat, 16)),
+         unchanged_outside(final(buf)@, old(buf)@, offset as int, offset + 16),
++        // Human spec
++        final(buf).len() == old(buf).len(),
+ {
+     // Consume the least-significant decimals from a working copy.
+     let mut remain = n;
+@@ -790,6 +1056,9 @@
+     ensures
+         r.0 == n / 1_0000_0000_0000_0000,
+         r.1 == n % 1_0000_0000_0000_0000,
++        // Human spec
++        r.1 < 10_000_000_000_000_000u64,
++        (r.0 as nat) * 10_000_000_000_000_000nat + (r.1 as nat) == (n as nat),
+ {
+     const D: u128 = 1_0000_0000_0000_0000;
+     // The check inlines well with the caller flow.
+@@ -892,44 +1161,45 @@
+ 
+ // ===== MAX_STR_LEN =====
+ //
+-// The trusted `write` methods pass `buf: &mut Self::Buffer`, an array of length
+-// `Self::MAX_STR_LEN`, to `Unsigned::fmt` and `Signed::fmt`. For each type, these lemmas show
+-// that this length is the length of the longest decimal representation of the type, so the
+-// precondition of `fmt` holds for every value, and `MAX_STR_LEN` is exactly what its
+-// documentation says. (`usize` and `isize` use the buffer of the fixed-size type they convert
+-// to.)
++// The `write` methods pass `buf: &mut Self::Buffer`, an array of length `Self::MAX_STR_LEN`,
++// to `Unsigned::fmt` and `Signed::fmt`. For each type, these lemmas show that this length is the
++// length of the longest decimal representation of the type, so the precondition of `fmt` holds
++// for every value, and `MAX_STR_LEN` is exactly what its documentation says. (`usize` and
++// `isize` use the buffer of the fixed-size type they convert to.)
+ 
+ macro_rules! lemmas_max_str_len {
+     ($unsigned_lemma:ident, $Unsigned:ident, $unsigned_len:literal, $signed_lemma:ident, $Signed:ident, $signed_len:literal) => {
+         verus! {
+-        proof fn $unsigned_lemma(buf: <$Unsigned as private::Sealed>::Buffer)
++        proof fn $unsigned_lemma()
+             ensures
+-                buf@.len() == $unsigned_len,
+-                buf@.len() == dec($Unsigned::MAX as nat).len(),
+-                forall|x: $Unsigned| #[trigger] dec(x as nat).len() <= buf@.len(),
++                <$Unsigned as Integer>::MAX_STR_LEN == $unsigned_len,
++                forall|buf: <$Unsigned as private::Sealed>::Buffer| #[trigger] buf@.len() == $unsigned_len,
++                $unsigned_len == dec($Unsigned::MAX as nat).len(),
++                forall|x: $Unsigned| #[trigger] dec(x as nat).len() <= $unsigned_len,
+         {
+             assert(pow10(($unsigned_len - 1) as nat) <= $Unsigned::MAX as nat) by (compute_only);
+             assert(($Unsigned::MAX as nat) < pow10($unsigned_len)) by (compute_only);
+             lemma_num_digits($Unsigned::MAX as nat, $unsigned_len);
+             lemma_dec_len($Unsigned::MAX as nat);
+-            assert forall|x: $Unsigned| #[trigger] dec(x as nat).len() <= buf@.len() by {
++            assert forall|x: $Unsigned| #[trigger] dec(x as nat).len() <= $unsigned_len by {
+                 lemma_dec_len(x as nat);
+                 lemma_num_digits_le(x as nat, $unsigned_len);
+             }
+         }
+ 
+-        proof fn $signed_lemma(buf: <$Signed as private::Sealed>::Buffer)
++        proof fn $signed_lemma()
+             ensures
+-                buf@.len() == $signed_len,
+-                buf@.len() == dec_int($Signed::MIN as int).len(),
+-                forall|x: $Signed| #[trigger] dec_int(x as int).len() <= buf@.len(),
++                <$Signed as Integer>::MAX_STR_LEN == $signed_len,
++                forall|buf: <$Signed as private::Sealed>::Buffer| #[trigger] buf@.len() == $signed_len,
++                $signed_len == dec_int($Signed::MIN as int).len(),
++                forall|x: $Signed| #[trigger] dec_int(x as int).len() <= $signed_len,
+         {
+             let m = -($Signed::MIN as int);
+             assert(pow10(($signed_len - 2) as nat) <= -($Signed::MIN as int)) by (compute_only);
+             assert(-($Signed::MIN as int) < pow10(($signed_len - 1) as nat)) by (compute_only);
+             lemma_num_digits(m as nat, ($signed_len - 1) as nat);
+             lemma_dec_len(m as nat);
+-            assert forall|x: $Signed| #[trigger] dec_int(x as int).len() <= buf@.len() by {
++            assert forall|x: $Signed| #[trigger] dec_int(x as int).len() <= $signed_len by {
+                 if x < 0 {
+                     lemma_dec_len((-x) as nat);
+                     lemma_num_digits_le((-x) as nat, ($signed_len - 1) as nat);
+diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/src/spec_equiv.rs verus_fixed/itoa/src/spec_equiv.rs
+--- verus/itoa/src/spec_equiv.rs	1969-12-31 19:00:00.000000000 -0500
++++ verus_fixed/itoa/src/spec_equiv.rs	2026-11-13 02:00:40.460082677 -0500
+@@ -0,0 +1,236 @@
++//! The two specifications agree. Claude's (`spec.rs`) describes the output as bytes (`dec`,
++//! `dec_int`); the developer's (`human_spec.rs`) describes it as chars (`decimal_unsigned`,
++//! `decimal_signed`), as the view of the returned `&str`. These lemmas show that they are the
++//! same text, and connect the bytes in the buffer to the chars of the returned `&str`.
++//!
++//! Ghost code only: `verus!` erases all of it from normal builds. Nothing here is trusted.
++
++#![allow(unused_imports)]
++use crate::human_spec::*;
++use crate::spec::*;
++#[cfg(verus_keep_ghost)]
++use crate::trusted::suffix_bytes;
++use core::mem::MaybeUninit;
++use vstd::prelude::*;
++#[cfg(verus_keep_ghost)]
++use vstd::raw_ptr::MemContents;
++#[cfg(verus_keep_ghost)]
++use vstd::string::{is_ascii, StringSliceAdditionalSpecFns};
++#[cfg(verus_keep_ghost)]
++use vstd::utf8::{
++    encode_utf8, encode_utf8_decode_utf8, encode_utf8_valid_utf8, is_ascii_chars,
++    is_ascii_chars_encode_utf8, valid_utf8,
++};
++
++verus! {
++
++/// Every byte of `bytes` is ASCII (below 128).
++pub open spec fn all_ascii(bytes: Seq<u8>) -> bool {
++    forall|i: int| 0 <= i < bytes.len() ==> #[trigger] bytes[i] < 128
++}
++
++/// The chars of the bytes `bytes`, one char per byte.
++pub open spec fn ascii_chars(bytes: Seq<u8>) -> Seq<char> {
++    Seq::new(bytes.len(), |i: int| bytes[i] as char)
++}
++
++// ===== Digits =====
++
++/// Claude's digit byte (`digit`) is the developer's digit char (`decimal_digit`).
++pub proof fn lemma_digit_char(d: nat)
++    requires
++        d < 10,
++    ensures
++        digit(d) as char == decimal_digit(d),
++        48 <= digit(d) <= 57,
++{
++    assert(d == 0 || d == 1 || d == 2 || d == 3 || d == 4 || d == 5 || d == 6 || d == 7 || d == 8
++        || d == 9);
++}
++
++/// `dec` and `decimal_unsigned` are the same text.
++pub proof fn lemma_dec_chars(n: nat)
++    ensures
++        ascii_chars(dec(n)) == decimal_unsigned(n),
++    decreases n,
++{
++    lemma_digit_char(n % 10);
++    if n < 10 {
++        lemma_dec_pad_1(n);
++        assert(ascii_chars(dec(n)) =~= decimal_unsigned(n));
++    } else {
++        lemma_dec_chars(n / 10);
++        assert(dec(n) == dec(n / 10).push(digit(n % 10)));
++        lemma_dec_len(n / 10);
++        assert(ascii_chars(dec(n)) =~= ascii_chars(dec(n / 10)).push(digit(n % 10) as char));
++    }
++}
++
++/// `decimal_unsigned(n)` has as many chars as `dec(n)` has bytes, and at least one.
++pub proof fn lemma_dec_len_human(n: nat)
++    ensures
++        decimal_unsigned(n).len() == dec(n).len(),
++        1 <= dec(n).len(),
++{
++    lemma_dec_chars(n);
++    lemma_dec_value(n);
++}
++
++/// `dec_int` and `decimal_signed` are the same text, which is ASCII, has at least one char and
++/// is decimal text in the developer's sense (`is_decimal_text`).
++pub proof fn lemma_dec_int_text(n: int)
++    ensures
++        all_ascii(dec_int(n)),
++        ascii_chars(dec_int(n)) == decimal_signed(n),
++        is_decimal_text(decimal_signed(n)),
++        is_ascii_chars(decimal_signed(n)),
++        1 <= decimal_signed(n).len() == dec_int(n).len(),
++{
++    let m: nat = if n < 0 {
++        (-n) as nat
++    } else {
++        n as nat
++    };
++    lemma_dec_value(m);
++    lemma_dec_chars(m);
++    let s = decimal_signed(n);
++    if n < 0 {
++        assert(ascii_chars(dec_int(n)) =~= seq!['-'].add(decimal_unsigned(m)));
++        assert forall|i: int| 0 <= i < dec_int(n).len() implies #[trigger] dec_int(n)[i] < 128 by {
++            if i > 0 {
++                assert(dec_int(n)[i] == dec(m)[i - 1]);
++            }
++        }
++        assert forall|k: int| 0 <= k < s.len() implies (s[k] >= '0' && s[k] <= '9') || (k == 0
++            && s[k] == '-') by {
++            if k > 0 {
++                assert(s[k] == dec(m)[k - 1] as char);
++            }
++        }
++    } else {
++        assert forall|k: int| 0 <= k < s.len() implies (s[k] >= '0' && s[k] <= '9') || (k == 0
++            && s[k] == '-') by {
++            assert(s[k] == dec(m)[k] as char);
++        }
++    }
++    assert forall|k: int| 0 <= k < s.len() implies '\0' <= #[trigger] s[k] <= '\u{7f}' by {
++        assert(s[k] == dec_int(n)[k] as char);
++    }
++}
++
++// ===== From bytes to `&str` =====
++
++/// A `&str` whose UTF-8 bytes are all ASCII has one char per byte, and these bytes are valid
++/// UTF-8 (the precondition of `str::from_utf8_unchecked`).
++pub proof fn lemma_ascii_str(s: &str, bytes: Seq<u8>)
++    requires
++        s.spec_bytes() == bytes,
++        all_ascii(bytes),
++    ensures
++        s@ == ascii_chars(bytes),
++        is_ascii(s),
++        valid_utf8(bytes),
++{
++    let cs = ascii_chars(bytes);
++    assert forall|i: int| 0 <= i < cs.len() implies '\0' <= #[trigger] cs[i] <= '\u{7f}' by {
++        assert(bytes[i] < 128);
++    }
++    is_ascii_chars_encode_utf8(cs);
++    assert forall|i: int| 0 <= i < cs.len() implies #[trigger] encode_utf8(cs)[i] == bytes[i] by {
++        assert(cs[i] as u8 == encode_utf8(cs)[i]);
++        assert(bytes[i] < 128);
++    }
++    assert(encode_utf8(cs) =~= bytes);
++    encode_utf8_valid_utf8(cs);
++    encode_utf8_decode_utf8(cs);
++    encode_utf8_decode_utf8(s@);
++}
++
++/// The `&str` whose UTF-8 bytes are `dec_int(n)` is the developer's `decimal_signed(n)`.
++pub proof fn lemma_str_of_dec_int(n: int)
++    ensures
++        valid_utf8(dec_int(n)),
++        forall|s: &str|
++            #[trigger] s.spec_bytes() == dec_int(n) ==> {
++                &&& s@ == decimal_signed(n)
++                &&& is_ascii(s)
++                &&& is_decimal_text(s@)
++                &&& 1 <= s@.len() == dec_int(n).len()
++            },
++{
++    lemma_dec_int_text(n);
++    assert forall|s: &str| #[trigger] s.spec_bytes() == dec_int(n) implies {
++        &&& s@ == decimal_signed(n)
++        &&& is_ascii(s)
++        &&& is_decimal_text(s@)
++        &&& 1 <= s@.len() == dec_int(n).len()
++    } by {
++        lemma_ascii_str(s, dec_int(n));
++    }
++    if dec_int(n).len() >= 0 {
++        // `valid_utf8(dec_int(n))`, from `lemma_ascii_str` applied to any string with these bytes.
++        let cs = ascii_chars(dec_int(n));
++        assert forall|i: int| 0 <= i < cs.len() implies '\0' <= #[trigger] cs[i] <= '\u{7f}' by {
++            assert(dec_int(n)[i] < 128);
++        }
++        is_ascii_chars_encode_utf8(cs);
++        assert forall|i: int| 0 <= i < cs.len() implies #[trigger] encode_utf8(cs)[i] == dec_int(n)[i] by {
++            assert(cs[i] as u8 == encode_utf8(cs)[i]);
++            assert(dec_int(n)[i] < 128);
++        }
++        assert(encode_utf8(cs) =~= dec_int(n));
++        encode_utf8_valid_utf8(cs);
++    }
++}
++
++/// When `buf[offset..]` holds exactly `bytes`, all ASCII, the precondition of the trusted
++/// `slice_buffer_to_str` holds (`initialized_ascii_suffix`), and the bytes it reads are `bytes`.
++pub proof fn lemma_holds_suffix(buf: Seq<MaybeUninit<u8>>, offset: int, bytes: Seq<u8>)
++    requires
++        holds(buf, offset, bytes),
++        offset + bytes.len() == buf.len(),
++        all_ascii(bytes),
++    ensures
++        forall|i: int|
++            offset <= i < buf.len() ==> {
++                &&& (#[trigger] buf[i]).mem_contents().is_init()
++                &&& buf[i].mem_contents().value() < 128
++            },
++        suffix_bytes(buf, offset) == bytes,
++{
++    reveal(holds);
++    assert forall|i: int| offset <= i < buf.len() implies {
++        &&& (#[trigger] buf[i]).mem_contents().is_init()
++        &&& buf[i].mem_contents().value() < 128
++    } by {
++        assert(buf[i].mem_contents() == MemContents::Init(bytes[i - offset]));
++    }
++    assert forall|i: int| 0 <= i < bytes.len() implies #[trigger] suffix_bytes(buf, offset)[i] == bytes[i] by {
++        assert(buf[offset + i].mem_contents() == MemContents::Init(bytes[(offset + i) - offset]));
++    }
++    assert(suffix_bytes(buf, offset) =~= bytes);
++}
++
++// ===== The trusted contract of `slice_buffer_to_str` =====
++
++/// The trusted contract of `slice_buffer_to_str` (`trusted.rs`) implies the developer's
++/// postcondition for it: under the developer's precondition, the result has `buf.len() - offset`
++/// chars and is ASCII. (The trusted contract also fixes the content: the bytes of the result
++/// are the bytes in the buffer.)
++pub proof fn lemma_slice_buffer_to_str_human(buf: &[MaybeUninit<u8>], offset: usize, result: &str)
++    requires
++        offset <= buf.len(),
++        initialized_ascii_suffix(buf, offset),
++        result.spec_bytes() == suffix_bytes(buf@, offset as int),
++    ensures
++        result@.len() == buf.len() - offset,
++        result.is_ascii(),
++{
++    let bytes = suffix_bytes(buf@, offset as int);
++    assert forall|i: int| 0 <= i < bytes.len() implies #[trigger] bytes[i] < 128 by {
++        assert(buf@[offset + i].mem_contents().value() < 128);
++    }
++    lemma_ascii_str(result, bytes);
++}
++
++} // verus!
+diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/src/trusted.rs verus_fixed/itoa/src/trusted.rs
+--- verus/itoa/src/trusted.rs	2026-11-09 21:59:40.810485803 -0500
++++ verus_fixed/itoa/src/trusted.rs	2026-11-13 01:54:25.998972889 -0500
+@@ -1,129 +1,60 @@
+-//! TRUSTED code: the parts of itoa that Verus does not verify.
++//! TRUSTED code: the two raw-pointer reinterpretations that Verus cannot verify.
+ //!
+-//! Verus skips this module (`#[cfg_attr(verus_keep_ghost, verifier::external)]` on `mod trusted`
+-//! in `lib.rs`); normal builds compile it like any other module. The items are upstream's code,
+-//! moved here unchanged, except the `write` method for the signed types (T2), whose formatting
+-//! logic moved into the verified `Signed::fmt`.
++//! Each item is `#[verifier::external_body]`: Verus does not check its body, but it checks every
++//! call against the contract stated here, so these contracts are the whole trusted interface.
++//! `verus --no-cheating` lists exactly these two items. Everything else in the crate is verified,
++//! including the `write` methods and `Buffer::format`, which call these.
+ //!
+-//! | id | items | why trusted |
+-//! |----|-------|-------------|
+-//! | T1 | `Buffer::format` | reinterprets the `[MaybeUninit<u8>; 40]` buffer as `I::Buffer` through a raw pointer cast; Verus cannot reason about a cast between array types |
+-//! | T2 | `impl_Integer!`, `impl_Integer_size!`: the `Integer` and `Sealed` impls (`MAX_STR_LEN`, `Buffer`, `write`) | `write` calls `slice_buffer_to_str` (T3); `MAX_STR_LEN` uses `ilog10`, which vstd does not specify (its value is checked by Verus through the `Buffer` types, see the `lemma_max_str_len_*` lemmas in `lib.rs`) |
+-//! | T3 | `slice_buffer_to_str` | reinterprets `&[MaybeUninit<u8>]` as `&[u8]` through a raw pointer cast, then calls `str::from_utf8_unchecked` |
++//! | id | item | upstream code | why trusted |
++//! |----|------|---------------|-------------|
++//! | T1 | `buffer_of` | the cast in `Buffer::format` | reinterprets the `[MaybeUninit<u8>; 40]` buffer as `I::Buffer` through a raw pointer, which needs a `PointsTo` permission in Verus |
++//! | T3 | `slice_buffer_to_str` | the whole function | reinterprets `&[MaybeUninit<u8>]` as `&[u8]` through a raw pointer; `get_unchecked(offset..)` is unspecified |
+ //!
+-//! Obligations, checked by inspection (see `VERIFICATION.md`, "Trusted base"):
++//! (T2, the `Integer` and `Sealed` impls, was trusted in Claude's first pass. It is verified now.)
+ //!
+-//! - T1: `I::Buffer` is `[MaybeUninit<u8>; I::MAX_STR_LEN]` and `I::MAX_STR_LEN <= 40`, so the
+-//!   cast stays within `self.bytes`; `string.len() <= I::MAX_STR_LEN` holds because `write`
+-//!   returns `buf[offset..]` of a `buf` of that length.
+-//! - T2: each `write` passes `buf: &mut Self::Buffer` to the verified `Unsigned::fmt` or
+-//!   `Signed::fmt`, whose precondition holds for every value by the verified
+-//!   `lemma_max_str_len_*` lemmas; their postcondition says that `buf[offset..]` is initialized
+-//!   with the decimal representation of `self`, which is ASCII, as T3 requires.
+-//! - T3: called only from T2, with that guarantee.
+-
+-use crate::{private, Buffer, Integer, Signed, Unsigned};
+-use core::hint;
++//! Obligations, checked by inspection (see `SPEC_REVIEW.md`):
++//!
++//! - T1: for every `I: Integer`, `I::Buffer` is an array of `I::MAX_STR_LEN` elements of
++//!   `MaybeUninit<u8>` (`lib.rs`, `impl_Integer!` and `impl_Integer_size!`), and Verus proves
++//!   `I::MAX_STR_LEN <= 40` (`Integer::lemma_max_str_len`). So the cast stays inside `bytes`, and
++//!   `MaybeUninit<u8>` has no alignment or validity requirement. No contract is needed: `write`
++//!   accepts any buffer.
++//! - T3: the contract is the body's meaning. `get_unchecked(offset..)` needs `offset <= buf.len()`;
++//!   reading the elements as `u8` needs them initialized; `str::from_utf8_unchecked` needs valid
++//!   UTF-8, which ASCII bytes are (`spec_equiv::lemma_ascii_str` proves it), and vstd specifies
++//!   its result by `res.spec_bytes() == v@`, which is the `ensures` below.
++
++#![allow(unused_imports)]
++#[cfg(verus_keep_ghost)]
++use crate::human_spec::initialized_ascii_suffix;
++use crate::{private, Integer};
+ use core::mem::MaybeUninit;
+ use core::str;
+ #[cfg(feature = "no-panic")]
+ use no_panic::no_panic;
+-
+-// ===== T1 =====
+-
+-impl Buffer {
+-    /// Print an integer into this buffer and return a reference to its string
+-    /// representation within the buffer.
+-    #[cfg_attr(feature = "no-panic", no_panic)]
+-    pub fn format<I: Integer>(&mut self, i: I) -> &str {
+-        let buf_ptr = self.bytes.as_mut_ptr().cast::<I::Buffer>();
+-        let string = i.write(unsafe { &mut *buf_ptr });
+-        if string.len() > I::MAX_STR_LEN {
+-            unsafe { hint::unreachable_unchecked() };
+-        }
+-        string
+-    }
++use vstd::prelude::*;
++#[cfg(verus_keep_ghost)]
++use vstd::string::StringSliceAdditionalSpecFns;
++
++verus! {
++
++/// The initialized bytes `buf[offset..]`.
++pub open spec fn suffix_bytes(buf: Seq<MaybeUninit<u8>>, offset: int) -> Seq<u8> {
++    Seq::new((buf.len() - offset) as nat, |i: int| buf[offset + i].mem_contents().value())
+ }
+ 
+-// ===== T2 =====
+-
+-macro_rules! impl_Integer {
+-    ($Signed:ident, $Unsigned:ident) => {
+-        const _: () = {
+-            assert!($Signed::MIN < 0, "need signed");
+-            assert!($Unsigned::MIN == 0, "need unsigned");
+-            assert!($Signed::BITS == $Unsigned::BITS, "need counterparts");
+-        };
+-
+-        impl Integer for $Unsigned {
+-            const MAX_STR_LEN: usize = $Unsigned::MAX.ilog10() as usize + 1;
+-        }
+-
+-        impl private::Sealed for $Unsigned {
+-            type Buffer = [MaybeUninit<u8>; Self::MAX_STR_LEN];
+-
+-            #[inline]
+-            #[cfg_attr(feature = "no-panic", no_panic)]
+-            fn write(self, buf: &mut Self::Buffer) -> &str {
+-                let offset = Unsigned::fmt(self, buf);
+-                // SAFETY: Starting from `offset`, all elements of the slice have been set.
+-                unsafe { slice_buffer_to_str(buf, offset) }
+-            }
+-        }
+-
+-        impl Integer for $Signed {
+-            const MAX_STR_LEN: usize = $Signed::MAX.ilog10() as usize + 2;
+-        }
+-
+-        impl private::Sealed for $Signed {
+-            type Buffer = [MaybeUninit<u8>; Self::MAX_STR_LEN];
+-
+-            #[inline]
+-            #[cfg_attr(feature = "no-panic", no_panic)]
+-            fn write(self, buf: &mut Self::Buffer) -> &str {
+-                // The formatting (upstream's body of this method, up to here) is in the
+-                // verified `Signed::fmt`.
+-                let offset = Signed::fmt(self, buf);
+-                // SAFETY: Starting from `offset`, all elements of the slice have been set.
+-                unsafe { slice_buffer_to_str(buf, offset) }
+-            }
+-        }
+-    };
+-}
++// ===== T1 =====
+ 
+-impl_Integer!(i8, u8);
+-impl_Integer!(i16, u16);
+-impl_Integer!(i32, u32);
+-impl_Integer!(i64, u64);
+-impl_Integer!(i128, u128);
+-
+-macro_rules! impl_Integer_size {
+-    ($t:ty as $primitive:ident #[cfg(target_pointer_width = $width:literal)]) => {
+-        #[cfg(target_pointer_width = $width)]
+-        impl Integer for $t {
+-            const MAX_STR_LEN: usize = <$primitive as Integer>::MAX_STR_LEN;
+-        }
+-
+-        #[cfg(target_pointer_width = $width)]
+-        impl private::Sealed for $t {
+-            type Buffer = <$primitive as private::Sealed>::Buffer;
+-
+-            #[inline]
+-            #[cfg_attr(feature = "no-panic", no_panic)]
+-            fn write(self, buf: &mut Self::Buffer) -> &str {
+-                (self as $primitive).write(buf)
+-            }
+-        }
+-    };
++/// `bytes` reinterpreted as `I::Buffer`. This is upstream's cast from `Buffer::format`
++/// (`self.bytes.as_mut_ptr().cast::<I::Buffer>()` and `&mut *buf_ptr`), moved into its own
++/// function so that the rest of `format` is verified.
++#[verifier::external_body]
++#[inline(always)]
++pub(crate) fn buffer_of<I: Integer>(bytes: &mut [MaybeUninit<u8>; private::I128_MAX_STR_LEN]) -> &mut I::Buffer {
++    let buf_ptr = bytes.as_mut_ptr().cast::<I::Buffer>();
++    unsafe { &mut *buf_ptr }
+ }
+ 
+-impl_Integer_size!(isize as i16 #[cfg(target_pointer_width = "16")]);
+-impl_Integer_size!(usize as u16 #[cfg(target_pointer_width = "16")]);
+-impl_Integer_size!(isize as i32 #[cfg(target_pointer_width = "32")]);
+-impl_Integer_size!(usize as u32 #[cfg(target_pointer_width = "32")]);
+-impl_Integer_size!(isize as i64 #[cfg(target_pointer_width = "64")]);
+-impl_Integer_size!(usize as u64 #[cfg(target_pointer_width = "64")]);
+-
+ // ===== T3 =====
+ 
+ /// This function converts a slice of ascii characters into a `&str` starting
+@@ -134,10 +65,20 @@
+ /// `buf` content starting from `offset` index MUST BE initialized and MUST BE
+ /// ascii characters.
+ #[cfg_attr(feature = "no-panic", no_panic)]
+-unsafe fn slice_buffer_to_str(buf: &[MaybeUninit<u8>], offset: usize) -> &str {
++#[verifier::external_body]
++pub(crate) unsafe fn slice_buffer_to_str(buf: &[MaybeUninit<u8>], offset: usize) -> (result: &str)
++    requires
++        // Human spec
++        offset <= buf.len(),
++        initialized_ascii_suffix(buf, offset),
++    ensures
++        result.spec_bytes() == suffix_bytes(buf@, offset as int),
++{
+     // SAFETY: `offset` is always included between 0 and `buf`'s length.
+     let written = unsafe { buf.get_unchecked(offset..) };
+     // SAFETY: (`assume_init_ref`) All buf content since offset is set.
+     // SAFETY: (`from_utf8_unchecked`) Writes use ASCII from the lookup table exclusively.
+     unsafe { str::from_utf8_unchecked(&*(written as *const [MaybeUninit<u8>] as *const [u8])) }
+ }
++
++} // verus!
+diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/src/u128_ext.rs verus_fixed/itoa/src/u128_ext.rs
+--- verus/itoa/src/u128_ext.rs	2026-11-09 21:47:24.049341789 -0500
++++ verus_fixed/itoa/src/u128_ext.rs	2026-11-13 01:58:27.453083806 -0500
+@@ -117,6 +117,8 @@
+ pub(crate) fn mulhi(x: u128, y: u128) -> (hi: u128)
+     ensures
+         hi as int == (x as int * y as int) / b128(),
++        // Human spec
++        hi as nat == (x as nat) * (y as nat) / 340282366920938463463374607431768211456nat,
+ {
+     let x_lo = x as u64;
+     let x_hi = (x >> 64) as u64;
+diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/src/verified_examples.rs verus_fixed/itoa/src/verified_examples.rs
+--- verus/itoa/src/verified_examples.rs	1969-12-31 19:00:00.000000000 -0500
++++ verus_fixed/itoa/src/verified_examples.rs	2026-11-13 02:00:40.550079728 -0500
+@@ -0,0 +1,50 @@
++//! Verified clients of `Buffer::format`. They show that its contract determines the output:
++//! Verus proves the exact strings of upstream's doc examples, and the extreme values of a type.
++//! Only compiled under Verus (`#[cfg(verus_keep_ghost)]` on the module).
++
++use crate::human_spec::*;
++use crate::Buffer;
++use vstd::prelude::*;
++
++verus! {
++
++/// The crate-level doc example: `buffer.format(128u64) == "128"`.
++fn example_doc_128() {
++    let mut buffer = Buffer::new();
++    let printed = buffer.format(128u64);
++    reveal_with_fuel(decimal_unsigned, 3);
++    assert(printed@ == seq!['1', '2', '8']);
++}
++
++/// The doc example of `Buffer`: `buffer.format(1234) == "1234"` (an `i32`).
++fn example_doc_1234() {
++    let mut buffer = Buffer::new();
++    let printed = buffer.format(1234i32);
++    reveal_with_fuel(decimal_unsigned, 4);
++    assert(printed@ == seq!['1', '2', '3', '4']);
++}
++
++/// Negative numbers get a `'-'`; zero is `"0"`.
++fn example_sign_and_zero() {
++    let mut buffer = Buffer::new();
++    let printed = buffer.format(-128i8);
++    reveal_with_fuel(decimal_unsigned, 3);
++    assert(printed@ == seq!['-', '1', '2', '8']);
++
++    let printed = buffer.format(0u128);
++    assert(printed@ == seq!['0']);
++}
++
++/// The longest output of each type has exactly `MAX_STR_LEN` chars.
++fn example_max_len() {
++    let mut buffer = Buffer::new();
++    let printed = buffer.format(i8::MIN);
++    reveal_with_fuel(decimal_unsigned, 3);
++    assert(printed@.len() == <i8 as crate::Integer>::MAX_STR_LEN);
++
++    let printed = buffer.format(u16::MAX);
++    reveal_with_fuel(decimal_unsigned, 5);
++    assert(printed@.len() == <u16 as crate::Integer>::MAX_STR_LEN);
++}
++
++} // verus!
+diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/negative_controls.py verus_fixed/negative_controls.py
+--- verus/negative_controls.py	2026-11-09 22:41:11.317532211 -0500
++++ verus_fixed/negative_controls.py	2026-11-13 02:17:03.050294199 -0500
+@@ -1,7 +1,12 @@
+ #!/usr/bin/env python3
+ """Negative controls: inject one bug at a time into a scratch copy of itoa/src and check that
+-Verus rejects it. Usage: python3 negative_controls.py (from verus/), with `verus` on PATH or
+-VERUS=/path/to/verus. Exits 1 if any mutant verifies."""
++Verus rejects it. Usage: python3 negative_controls.py (from verus_fixed/), with `verus` on PATH or
++VERUS=/path/to/verus. Exits 1 if any mutant is accepted.
++
++A mutant is rejected when verification fails, or when `--no-cheating` reports a trust marker
++beyond the two expected ones (`buffer_of` and `slice_buffer_to_str` in trusted.rs).
++M1-M20 are the mutants of Claude's first pass (M16/M17 re-anchored: `MAX_STR_LEN` moved out of
++trusted.rs); M21-M28 exercise the contracts added in verus_fixed."""
+ import os
+ import re
+ import shutil
+@@ -13,23 +18,43 @@
+ SRC = os.path.join(HERE, 'itoa', 'src')
+ VERUS = os.environ.get('VERUS', shutil.which('verus') or 'verus')
+ 
+-# (id, description, file, old text, new text). `old` must occur exactly once in `file`.
++# The macros' compile-time checks of the `MAX_STR_LEN` constants against upstream's formula.
++# M16/M17 delete them, so that the mutant tests Verus rather than rustc's const evaluation.
++ASSERT_UNSIGNED = ('            assert!(private::$unsigned_len == $Unsigned::MAX.ilog10() as usize + 1, '
++                   '"wrong unsigned length");\n')
++ASSERT_SIGNED = ('            assert!(private::$signed_len == $Signed::MAX.ilog10() as usize + 2, '
++                 '"wrong signed length");\n')
++
++UNSIGNED_WRITE_TAIL = '''                let offset = Unsigned::fmt(self, buf);
++                proof {
++                    lemma_holds_suffix(buf@, offset as int, dec(self as nat));
++                }
++                // SAFETY: Starting from `offset`, all elements of the slice have been set.
++                unsafe { slice_buffer_to_str(buf, offset) }'''
++SIGNED_WRITE_TAIL = '''                let offset = Signed::fmt(self, buf);
++                proof {
++                    lemma_holds_suffix(buf@, offset as int, dec_int(self as int));
++                }
++                // SAFETY: Starting from `offset`, all elements of the slice have been set.
++                unsafe { slice_buffer_to_str(buf, offset) }'''
++
++# (id, description, [(file, old text, new text), ...]). Each `old` must occur exactly once.
+ MUTANTS = [
+-    ('M1', 'divmod100: shift 18 instead of 19 (wrong reciprocal)', 'lib.rs',
+-     'const EXP: u32 = 19;', 'const EXP: u32 = 18;'),
+-    ('M2', 'DECIMAL_PAIRS: entry "07" stored as "70"', 'lib.rs',
++    ('M1', 'divmod100: shift 18 instead of 19 (wrong reciprocal)', [('lib.rs',
++     'const EXP: u32 = 19;', 'const EXP: u32 = 18;')]),
++    ('M2', 'DECIMAL_PAIRS: entry "07" stored as "70"', [('lib.rs',
+      '48, 54, 48, 55, 48, 56, 48, 57, // "00010203040506070809"',
+-     '48, 54, 55, 48, 48, 56, 48, 57, // "00010203040506070809"'),
+-    ('M3', 'div_rem_1e16: M_HIGH one too small (floor instead of ceiling of 2^179 / 10^16)', 'lib.rs',
++     '48, 54, 55, 48, 48, 56, 48, 57, // "00010203040506070809"')]),
++    ('M3', 'div_rem_1e16: M_HIGH one too small (floor instead of ceiling of 2^179 / 10^16)', [('lib.rs',
+      'const M_HIGH: u128 = 76624777043294442917917351357515459181;',
+-     'const M_HIGH: u128 = 76624777043294442917917351357515459180;'),
+-    ('M4', 'div_rem_1e16: post-shift 50 instead of 51', 'lib.rs',
+-     'const SH_POST: u8 = 51;', 'const SH_POST: u8 = 50;'),
+-    ('M5', 'mulhi: drops the second carry `high2`', 'u128_ext.rs',
+-     'u128::from(x_hi) * u128::from(y_hi) + high1 + high2', 'u128::from(x_hi) * u128::from(y_hi) + high1'),
+-    ('M6', 'mulhi: high half of `m` taken with `>> 63`', 'u128_ext.rs',
+-     'let high1 = m >> 64;', 'let high1 = m >> 63;'),
+-    ('M7', 'u8..u64 fmt: the two pairs of a 4-digit group written in swapped order', 'lib.rs',
++     'const M_HIGH: u128 = 76624777043294442917917351357515459180;')]),
++    ('M4', 'div_rem_1e16: post-shift 50 instead of 51', [('lib.rs',
++     'const SH_POST: u8 = 51;', 'const SH_POST: u8 = 50;')]),
++    ('M5', 'mulhi: drops the second carry `high2`', [('u128_ext.rs',
++     'u128::from(x_hi) * u128::from(y_hi) + high1 + high2', 'u128::from(x_hi) * u128::from(y_hi) + high1')]),
++    ('M6', 'mulhi: high half of `m` taken with `>> 63`', [('u128_ext.rs',
++     'let high1 = m >> 64;', 'let high1 = m >> 63;')]),
++    ('M7', 'u8..u64 fmt: the two pairs of a 4-digit group written in swapped order', [('lib.rs',
+      'write_unchecked(buf, offset + 0, *get_unchecked(&DECIMAL_PAIRS.0, pair1 as usize * 2 + 0));\n'
+      '                    write_unchecked(buf, offset + 1, *get_unchecked(&DECIMAL_PAIRS.0, pair1 as usize * 2 + 1));\n'
+      '                    write_unchecked(buf, offset + 2, *get_unchecked(&DECIMAL_PAIRS.0, pair2 as usize * 2 + 0));\n'
+@@ -37,8 +62,8 @@
+      'write_unchecked(buf, offset + 0, *get_unchecked(&DECIMAL_PAIRS.0, pair2 as usize * 2 + 0));\n'
+      '                    write_unchecked(buf, offset + 1, *get_unchecked(&DECIMAL_PAIRS.0, pair2 as usize * 2 + 1));\n'
+      '                    write_unchecked(buf, offset + 2, *get_unchecked(&DECIMAL_PAIRS.0, pair1 as usize * 2 + 0));\n'
+-     '                    write_unchecked(buf, offset + 3, *get_unchecked(&DECIMAL_PAIRS.0, pair1 as usize * 2 + 1));'),
+-    ('M8', 'u8..u64 fmt: two-digit step only above 10 (10 would print as ":")', 'lib.rs',
++     '                    write_unchecked(buf, offset + 3, *get_unchecked(&DECIMAL_PAIRS.0, pair1 as usize * 2 + 1));')]),
++    ('M8', 'u8..u64 fmt: two-digit step only above 10 (10 would print as ":")', [('lib.rs',
+      '                // Format per two digits from the lookup table.\n                if remain > 9 {\n'
+      '                    let ghost (offset0, remain0, buf0) = (offset as nat, remain as nat, buf@);\n'
+      '                    proof {\n                        lemma_pow10_values();\n'
+@@ -46,84 +71,123 @@
+      '                // Format per two digits from the lookup table.\n                if remain > 10 {\n'
+      '                    let ghost (offset0, remain0, buf0) = (offset as nat, remain as nat, buf@);\n'
+      '                    proof {\n                        lemma_pow10_values();\n'
+-     '                        lemma_digits_room(v, N as nat, offset0, remain0, buf0, old(buf)@, 2);'),
+-    ('M9', 'u8..u64 fmt: no digit for zero (drops `|| self == 0`)', 'lib.rs',
+-     'if remain != 0 || self == 0 {', 'if remain != 0 {'),
+-    ('M10', 'u8..u64 fmt: offset moves 3 for a 4-digit group (groups overlap)', 'lib.rs',
++     '                        lemma_digits_room(v, N as nat, offset0, remain0, buf0, old(buf)@, 2);')]),
++    ('M9', 'u8..u64 fmt: no digit for zero (drops `|| self == 0`)', [('lib.rs',
++     'if remain != 0 || self == 0 {', 'if remain != 0 {')]),
++    ('M10', 'u8..u64 fmt: offset moves 3 for a 4-digit group (groups overlap)', [('lib.rs',
+      '                    offset -= 4;\n\n                    // pull two pairs\n                    let scale: Self',
+-     '                    offset -= 3;\n\n                    // pull two pairs\n                    let scale: Self'),
+-    ('M11', 'u128 fmt: second 16-digit block reported at N - 15', 'lib.rs',
+-     '(mod2, N - 16)', '(mod2, N - 15)'),
+-    ('M12', 'u128 fmt: zero shortcut removed (zero prints the empty string)', 'lib.rs',
++     '                    offset -= 3;\n\n                    // pull two pairs\n                    let scale: Self')]),
++    ('M11', 'u128 fmt: second 16-digit block reported at N - 15', [('lib.rs',
++     '(mod2, N - 16)', '(mod2, N - 15)')]),
++    ('M12', 'u128 fmt: zero shortcut removed (zero prints the empty string)', [('lib.rs',
+      '        if self == 0 {\n            let offset = buf.len() - 1;',
+-     '        if false {\n            let offset = buf.len() - 1;'),
+-    ('M13', 'enc_16lsd: loop stops one 4-digit group early', 'lib.rs',
+-     'while quad_index > 1', 'while quad_index > 2'),
+-    ('M14', 'Signed::fmt: unsigned_abs off by one for negative values', 'lib.rs',
+-     '(-(self + 1)) as $Unsigned + 1', '(-(self + 1)) as $Unsigned'),
+-    ('M15', "Signed::fmt: '-' written over the first digit", 'lib.rs',
++     '        if false {\n            let offset = buf.len() - 1;')]),
++    ('M13', 'enc_16lsd: loop stops one 4-digit group early', [('lib.rs',
++     'while quad_index > 1', 'while quad_index > 2')]),
++    ('M14', 'Signed::fmt: unsigned_abs off by one for negative values', [('lib.rs',
++     '(-(self + 1)) as $Unsigned + 1', '(-(self + 1)) as $Unsigned')]),
++    ('M15', "Signed::fmt: '-' written over the first digit", [('lib.rs',
+      '                    offset -= 1;\n                    write_unchecked(buf, offset, 45); // b\'-\'',
+-     '                    write_unchecked(buf, offset, 45); // b\'-\''),
+-    ('M16', 'trusted: unsigned MAX_STR_LEN one too small (`ilog10() + 0`)', 'trusted.rs',
+-     'const MAX_STR_LEN: usize = $Unsigned::MAX.ilog10() as usize + 1;',
+-     'const MAX_STR_LEN: usize = $Unsigned::MAX.ilog10() as usize + 0;'),
+-    ('M17', 'trusted: signed MAX_STR_LEN without room for the sign (`ilog10() + 1`)', 'trusted.rs',
+-     'const MAX_STR_LEN: usize = $Signed::MAX.ilog10() as usize + 2;',
+-     'const MAX_STR_LEN: usize = $Signed::MAX.ilog10() as usize + 1;'),
+-    ('M18', 'spec: digits encoded from b\'1\' instead of b\'0\'', 'spec.rs',
+-     '    (48 + d) as u8\n', '    (49 + d) as u8\n'),
+-    ('M19', 'cheating: `assume(false)` in divmod100 (rejected by --no-cheating)', 'lib.rs',
++     '                    write_unchecked(buf, offset, 45); // b\'-\'')]),
++    ('M16', 'u8 MAX_STR_LEN one too small (2), compile-time check removed', [
++     ('lib.rs', 'pub const U8_MAX_STR_LEN: usize = 3;', 'pub const U8_MAX_STR_LEN: usize = 2;'),
++     ('lib.rs', ASSERT_UNSIGNED, '')]),
++    ('M17', 'i64 MAX_STR_LEN without room for the sign (19), compile-time check removed', [
++     ('lib.rs', 'pub const I64_MAX_STR_LEN: usize = 20;', 'pub const I64_MAX_STR_LEN: usize = 19;'),
++     ('lib.rs', ASSERT_SIGNED, '')]),
++    ('M18', "spec: digits encoded from b'1' instead of b'0'", [('spec.rs',
++     '    (48 + d) as u8\n', '    (49 + d) as u8\n')]),
++    ('M19', 'cheating: `assume(false)` in divmod100 (a new trust marker for --no-cheating)', [('lib.rs',
+      '        assert(1u32 << 19u32 == 524288) by (bit_vector);',
+-     '        assume(false);'),
+-    ('M20', 'cheating: divmod100 made external_body (rejected by --no-cheating)', 'lib.rs',
++     '        assume(false);')]),
++    ('M20', 'cheating: divmod100 made external_body (a new trust marker for --no-cheating)', [('lib.rs',
+      '// Returns {value / 100, value % 100} correct for values of up to 4 digits.\nfn divmod100',
+      '// Returns {value / 100, value % 100} correct for values of up to 4 digits.\n'
+-     '#[verifier::external_body]\nfn divmod100'),
++     '#[verifier::external_body]\nfn divmod100')]),
++    # --- contracts added in verus_fixed ---
++    ('M21', 'unsigned write: the string starts one byte late (drops the leading digit)', [('lib.rs',
++     UNSIGNED_WRITE_TAIL, UNSIGNED_WRITE_TAIL.replace('slice_buffer_to_str(buf, offset)',
++                                                      'slice_buffer_to_str(buf, offset + 1)'))]),
++    ('M22', 'signed write: the string starts at 0 (reads the uninitialized prefix)', [('lib.rs',
++     SIGNED_WRITE_TAIL, SIGNED_WRITE_TAIL.replace('slice_buffer_to_str(buf, offset)',
++                                                  'slice_buffer_to_str(buf, 0)'))]),
++    ('M23', 'format: the `unreachable_unchecked` length check uses `>=` (reachable at full length)', [('lib.rs',
++     'if string.len() > I::MAX_STR_LEN {', 'if string.len() >= I::MAX_STR_LEN {')]),
++    ('M24', 'usize MAX_STR_LEN taken from u32 (10) instead of u64 (20)', [('lib.rs',
++     'impl_Integer_size!(usize as u64, U64_MAX_STR_LEN #[cfg(target_pointer_width = "64")]);',
++     'impl_Integer_size!(usize as u64, U32_MAX_STR_LEN #[cfg(target_pointer_width = "64")]);')]),
++    ('M25', 'trusted contract of slice_buffer_to_str shifted by one byte', [('trusted.rs',
++     'result.spec_bytes() == suffix_bytes(buf@, offset as int),',
++     'result.spec_bytes() == suffix_bytes(buf@, offset as int + 1),')]),
++    ('M26', "developer's spec: decimal_digit(7) is '8'", [('human_spec.rs',
++     "    } else if d == 7 {\n        '7'", "    } else if d == 7 {\n        '8'")]),
++    ('M27', "developer's spec: initialized_ascii_suffix requires nothing", [('human_spec.rs',
++     'pub open spec fn initialized_ascii_suffix(buf: &[MaybeUninit<u8>], offset: usize) -> bool {\n'
++     '    forall|i: int|',
++     'pub open spec fn initialized_ascii_suffix(buf: &[MaybeUninit<u8>], offset: usize) -> bool {\n'
++     '    true || forall|i: int|')]),
++    ('M28', 'usize MAX_STR_LEN taken from u128 (39) instead of u64 (20): too large', [('lib.rs',
++     'impl_Integer_size!(usize as u64, U64_MAX_STR_LEN #[cfg(target_pointer_width = "64")]);',
++     'impl_Integer_size!(usize as u64, U128_MAX_STR_LEN #[cfg(target_pointer_width = "64")]);')]),
+ ]
+ 
+ 
+-def run_verus(root):
+-    proc = subprocess.run([VERUS, '--crate-type=lib', '--no-cheating', 'src/lib.rs'], cwd=root,
++def run(root, *flags):
++    proc = subprocess.run([VERUS, '--crate-type=lib', *flags, 'src/lib.rs'], cwd=root,
+                           capture_output=True, text=True)
+-    out = proc.stdout + proc.stderr
+-    m = re.search(r'verification results:: (\d+) verified, (\d+) errors', out)
+-    errors = [line.strip() for line in out.splitlines() if line.startswith('error')]
+-    ok = proc.returncode == 0 and m is not None and m.group(2) == '0'
+-    return ok, (errors[0] if errors else '(no error line)'), out
++    return proc.returncode, proc.stdout + proc.stderr
+ 
+ 
+-def main():
+-    failures = 0
+-    with tempfile.TemporaryDirectory() as tmp:
+-        root = os.path.join(tmp, 'crate')
+-        ok, _, out = run_verus_copy(root, None)
+-        if not ok:
+-            print('the unmodified crate does not verify:\n' + out)
+-            sys.exit(2)
+-        print('unmodified crate: verifies')
+-        for mid, desc, fname, old, new in MUTANTS:
+-            ok, first_error, _ = run_verus_copy(root, (fname, old, new))
+-            status = 'VERIFIED (BAD)' if ok else 'rejected'
+-            if ok:
+-                failures += 1
+-            print(f'{mid:<4} {status:<15} {desc}\n     -> {first_error}')
+-    print(f'{len(MUTANTS)} mutants, {len(MUTANTS) - failures} rejected')
+-    sys.exit(1 if failures else 0)
++def check(root):
++    """(verified, first error, trust markers): verification without --no-cheating, then the
++    locations that --no-cheating reports."""
++    code, out = run(root)
++    m = re.search(r'verification results:: (\d+) verified, (\d+) errors', out)
++    verified = code == 0 and m is not None and m.group(2) == '0'
++    errors = [line.strip() for line in out.splitlines() if line.startswith('error')]
++    _, out_nc = run(root, '--no-cheating')
++    markers, lines = [], out_nc.splitlines()
++    for i, line in enumerate(lines):
++        if line.startswith('error') and 'not allowed with --no-cheating' in line:
++            loc = re.search(r'--> (\S+):(\d+)', '\n'.join(lines[i + 1:i + 3]))
++            markers.append((loc.group(1), ' '.join(lines[i + 3:i + 4]).strip()) if loc else ('?', line))
++    return verified, (errors[0] if errors else '(no error line)'), markers
+ 
+ 
+-def run_verus_copy(root, mutation):
++def copy_with(root, edits):
+     if os.path.exists(root):
+         shutil.rmtree(root)
+     shutil.copytree(SRC, os.path.join(root, 'src'))
+-    if mutation:
+-        fname, old, new = mutation
++    for fname, old, new in edits:
+         path = os.path.join(root, 'src', fname)
+         text = open(path).read()
+         count = text.count(old)
+         if count != 1:
+             raise SystemExit(f'mutation anchor found {count} times in {fname}: {old!r}')
+         open(path, 'w').write(text.replace(old, new))
+-    return run_verus(root)
++
++
++def main():
++    failures = 0
++    with tempfile.TemporaryDirectory() as tmp:
++        root = os.path.join(tmp, 'crate')
++        copy_with(root, [])
++        ok, err, base_markers = check(root)
++        if not ok or len(base_markers) != 2:
++            print(f'the unmodified crate does not verify, or has {len(base_markers)} trust markers: {err}')
++            sys.exit(2)
++        print('unmodified crate: verifies; --no-cheating reports the 2 trusted items')
++        for mid, desc, edits in MUTANTS:
++            copy_with(root, edits)
++            ok, err, markers = check(root)
++            extra = len(markers) - len(base_markers)
++            accepted = ok and extra <= 0
++            if accepted:
++                failures += 1
++            why = err if not ok else f'{extra} new trust marker(s) under --no-cheating'
++            print(f'{mid:<4} {"ACCEPTED (BAD)" if accepted else "rejected":<15} {desc}\n     -> {why}')
++    print(f'{len(MUTANTS)} mutants, {len(MUTANTS) - failures} rejected')
++    sys.exit(1 if failures else 0)
+ 
+ 
+ if __name__ == '__main__':

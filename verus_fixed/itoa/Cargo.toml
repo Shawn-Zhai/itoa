@@ -1,0 +1,41 @@
+[package]
+name = "itoa"
+version = "1.0.19"
+authors = ["David Tolnay <dtolnay@gmail.com>"]
+categories = ["value-formatting", "no-std", "no-std::no-alloc"]
+description = "itoa 1.0.19 (master @ 9339ca9) annotated for Verus; see README.md"
+documentation = "https://docs.rs/itoa"
+edition = "2021"
+exclude = ["*.png"]
+keywords = ["integer"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dtolnay/itoa"
+# Upstream: 1.68. The `vstd` crate (needed for the `verus!` macro) requires a recent toolchain.
+rust-version = "1.95"
+publish = false
+
+[dependencies]
+no-panic = { version = "0.1", optional = true }
+# Only for the normal (non-Verus) build: provides the `verus!` macro, which erases the ghost
+# code. Verification uses the `verus` binary with its bundled vstd.
+vstd = { version = "=0.0.0-2026-05-06-1803", default-features = false }
+
+[target.'cfg(not(miri))'.dev-dependencies]
+criterion = { version = "0.8", default-features = false }
+
+[[bench]]
+name = "bench"
+harness = false
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+rustdoc-args = [
+    "--generate-link-to-definition",
+    "--generate-macro-expansion",
+    "--extern-html-root-url=core=https://doc.rust-lang.org",
+    "--extern-html-root-url=alloc=https://doc.rust-lang.org",
+    "--extern-html-root-url=std=https://doc.rust-lang.org",
+]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(verus_keep_ghost)', 'cfg(verus_only)'] }
