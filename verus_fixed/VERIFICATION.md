@@ -1,7 +1,9 @@
-# Verifying `itoa` with Verus (2026-11-09; amended 2026-11-13)
+# Verifying `itoa` with Verus (2026-11-09; amended 2026-11-13; ported to Verus 0.2026.11.22 on 2026-11-23)
 
-Crate: `itoa` 1.0.19, this fork's `master` @ 9339ca9. Verus 0.2026.05.03.8b81855 (the bare
-`verus` binary and its bundled vstd); the normal build uses rustc 1.95.0. Annotated crate:
+Crate: `itoa` 1.0.19, this fork's `master` @ 9339ca9. Verus 0.2026.11.22.1ce6a59 (the bare
+`verus` binary and its bundled vstd); the normal build uses rustc 1.100.0. (Written for Verus
+0.2026.05.03.8b81855 and rustc 1.95.0; see [Port to Verus 0.2026.11.22](#port-to-verus-020261122)
+for what the port changed and what was rerun.) Annotated crate:
 [`itoa/`](itoa/). Diff against upstream: [`upstream.diff`](upstream.diff). Specifications and
 proofs were written by Claude (Opus 5.5) in Claude Code on 2026-11-09, from the crate's
 documentation, its tests and the code (first pass: [`../verus/`](../verus/)).
@@ -20,17 +22,50 @@ in [`amendments.diff`](amendments.diff).
 
 | | |
 |---|---|
-| Verus | **165 verified, 0 errors**, about 5 s wall clock |
+| Verus | **165 verified, 0 errors**, about 4.5 s wall clock |
 | Trust markers (`verus --no-cheating`) | **exactly 2**, both `#[verifier::external_body]` in [`trusted.rs`](itoa/src/trusted.rs): `buffer_of` and `slice_buffer_to_str`. No `assume`, `admit`, `assume_specification`, axioms or `uninterp` |
 | Verified | the public API: `Buffer::format`, `new`, `Default`, `Clone`, and `write` for all 12 integer types; all digit generation: `Unsigned::fmt` for `u8`..`u128`, `enc_16lsd`, `div_rem_1e16` (including its Granlund–Montgomery constant), `mulhi`, `divmod100`, the `DECIMAL_PAIRS` table; the signed formatting (`Signed::fmt`, 5 types); `MAX_STR_LEN` for all 12 types |
 | Trusted, not verified | 4 statements of upstream code: the raw-pointer cast of `Buffer::format` (now `buffer_of`) and the body of `slice_buffer_to_str`, each with a contract Verus checks at every call ([`check_trusted.py`](check_trusted.py) checks that they are upstream's code) |
 | Developer's contracts | stated on every function they cover (marked `// Human spec`), all verified; `slice_buffer_to_str`'s is proved from its trusted contract |
 | Normal `cargo build` of the annotated crate | passes, 0 warnings; also `--features no-panic --release` and `--no-default-features`; `cargo clippy` with upstream's pedantic flags passes |
 | Upstream tests on the annotated crate | 11/11 integration, 2/2 doc (debug and release) |
-| Differential test | 8,144,968 values: annotated == upstream == `std`, every integer type, built with `no-panic` |
-| Machine code | `Buffer::format` compiles to the same instructions as in the first pass, for all 12 types |
+| Differential test | 8,134,557 values: annotated == upstream == `std`, every integer type, built with `no-panic` |
+| Machine code | `Buffer::format` compiles to the same instructions as in the first pass, for all 12 types (rechecked with rustc 1.100.0) |
 | Negative controls | 28/28 injected bugs rejected ([`negative_controls.py`](negative_controls.py)) |
 | Proof stability | same result with SMT seeds 0 to 39, 42 and 1234 |
+
+## Port to Verus 0.2026.11.22
+
+On 2026-11-23 this folder was moved from Verus 0.2026.05.03.8b81855 and rustc 1.95.0 to Verus
+0.2026.11.22.1ce6a59 and rustc 1.100.0, together with `../verus/`. It verified without changes to
+any specification, contract, proof or trusted item. The changes are:
+
+- the build pins: `vstd` `=0.0.0-2026-11-22-0344`, `rust-version` 1.100, `rust-toolchain.toml`
+  1.100.0;
+- two comments in `lib.rs` that said Verus crashes on an associated constant used as an array
+  length, which 0.2026.11.22 no longer does;
+- `negative_controls.py`: its match on the `--no-cheating` message accepts the backticks that
+  0.2026.11.22 puts around `--no-cheating`. Without that it found no trust markers and refused to
+  run;
+- `upstream.diff` and `amendments.diff`, regenerated. `amendments.diff` also picks up the one
+  change the port needed in `../verus/` (a type alias for `Buffer`'s field).
+
+Rerun with the new versions:
+
+| Check | Result |
+|---|---|
+| `verus --crate-type=lib src/lib.rs` | 165 verified, 0 errors, as before |
+| `verus --crate-type=lib --no-cheating src/lib.rs` | exactly the 2 trusted items |
+| SMT seeds 0 to 39, 42 and 1234 | all verify; the proofs are cheaper (see "Proof engineering") |
+| `negative_controls.py` | 28/28 rejected |
+| `check_trusted.py` | 0 unexpected changes |
+| Upstream CI steps, clippy with the pedantic flags, `cargo doc` | pass, 0 warnings |
+| Differential test | 8,134,557 values: annotated == upstream == `std`, and == `../verus` |
+| Machine code | identical to `../verus` (see "Observable differences") |
+| `../claude_human_spec_comparison/compare_specs.py` | the same report as the committed `spec_comparison.md` |
+| `../code_change_detection/detect_changes.py src verus_fixed` | every code finding keeps its fingerprint and its approval. The two files the port changed, `Cargo.toml` and `rust-toolchain.toml`, are reported as unreviewed and need a new review |
+
+The findings about Verus below were rechecked too; several no longer hold.
 
 ## The specification
 
@@ -149,8 +184,9 @@ T2 of the first pass (the `Integer`/`Sealed` impls, 82 upstream lines) is verifi
 
 ## Changes to the crate (audit of `upstream.diff`)
 
-- `lib.rs`: 124 lines removed, 874 added. Most additions are contracts, proof blocks, lemmas and
-  the `Signed` trait of the first pass.
+- `lib.rs`: 123 lines removed, 875 added (the `-` and `+` lines of `upstream.diff`; 2 of the
+  added lines are from the port, which lengthened two comments). Most additions are contracts,
+  proof blocks, lemmas and the `Signed` trait of the first pass.
 - `u128_ext.rs`: 1 line changed (`mulhi`'s signature names its result, for the `ensures`), 153
   ghost lines added. Its executable code is unchanged.
 - `Cargo.toml`: 2 lines removed, 10 added (unchanged from the first pass, whose report counted 9).
@@ -169,7 +205,7 @@ this folder; the others are from the first pass.
 | Change | Where | Reason |
 |---|---|---|
 | *(fixed)* `let buf_ptr = self.bytes.as_mut_ptr().cast::<I::Buffer>();` and `i.write(unsafe { &mut *buf_ptr })` → `i.write(buffer_of::<I>(&mut self.bytes))`, with the two statements in `buffer_of` (`#[inline(always)]`) | `Buffer::format` | isolates the raw-pointer cast, so that the rest of `format`, including its `unreachable_unchecked`, is verified. Same machine code |
-| *(fixed)* `const MAX_STR_LEN: usize = $Unsigned::MAX.ilog10() as usize + 1;` (and `+ 2`, and `<$primitive as Integer>::MAX_STR_LEN`) → plain constants `private::U8_MAX_STR_LEN`, ... (the developer's); the buffer types and `Buffer`'s field use them too | `impl_Integer!`, `impl_Integer_size!`, `Buffer`, `Buffer::new` | Verus crashes on an associated constant used as an array length, and cannot evaluate `ilog10`. Compile-time `assert!`s check the constants against upstream's formula; a Verus assertion checks the `usize`/`isize` ones against their primitive's |
+| *(fixed)* `const MAX_STR_LEN: usize = $Unsigned::MAX.ilog10() as usize + 1;` (and `+ 2`, and `<$primitive as Integer>::MAX_STR_LEN`) → plain constants `private::U8_MAX_STR_LEN`, ... (the developer's); the buffer types and `Buffer`'s field use them too | `impl_Integer!`, `impl_Integer_size!`, `Buffer`, `Buffer::new` | Verus 0.2026.05.03 crashed on an associated constant used as an array length (0.2026.11.22 no longer does), and Verus cannot evaluate `ilog10`. Compile-time `assert!`s check the constants against upstream's formula; a Verus assertion checks the `usize`/`isize` ones against their primitive's |
 | *(fixed)* `impl_Integer!` takes the two constants and two lemma names; `impl_Integer_size!` takes the constant (`impl_Integer_size!(usize as u64, U64_MAX_STR_LEN #[cfg(...)])`) | the macro invocations | to pass the constants and the per-type lemmas |
 | *(fixed)* the `Integer`/`Sealed` impls are back in `lib.rs`, inside `verus!`; `mod trusted` is no longer `#[verifier::external]` | `lib.rs`, `trusted.rs` | they are verified now |
 | `fn fmt(self, buf: &mut Self::Buffer)` → `fn fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])` | `trait Unsigned` and its 5 impls | for signed types upstream formats into a subslice of the longer signed buffer, converted with `(&mut buf[offset..]).try_into().unwrap()`. Verus supports neither mutable range indexing nor slice-to-array `try_into`. `fmt` writes right-aligned from `buf.len()` down, so on the whole signed buffer the digits land in the same places |
@@ -187,7 +223,10 @@ this folder; the others are from the first pass.
 
 - `Cargo.toml` gains a `vstd` dependency (`default-features = false`, so still `no_std`), which
   provides the `verus!` macro. No vstd function is called at run time.
-- `rust-version` goes from 1.68 to 1.95, and `rust-toolchain.toml` pins 1.95.0 (vstd needs it).
+- `rust-version` goes from 1.68 to 1.100, and `rust-toolchain.toml` pins 1.100.0, the toolchain
+  of Verus 0.2026.11.22. `vstd` is `=0.0.0-2026-11-22-0344`, the crates.io release of the same day
+  (built from Verus commit 8cf39ad; the binary is 1ce6a59). (Before the port: 1.95, 1.95.0 and
+  `vstd` `=0.0.0-2026-05-06-1803`.)
 - `publish = false`; `unexpected_cfgs` allows `verus_keep_ghost`.
 - Ghost-only imports are `#[cfg(verus_keep_ghost)]`; under Verus the developer's spec functions are
   re-exported at the crate root, where the developer defined them.
@@ -215,14 +254,17 @@ this folder; the others are from the first pass.
 
 - **Relative to the first pass: none.** `Buffer::format` compiles to identical instructions for all
   12 types (release build, x86-64; checked by comparing the assembly of a probe crate against each
-  version). The public API is the same; the new trait items are ghost and erased.
+  version). Rechecked after the port, with rustc 1.100.0: still identical, and so are the
+  out-of-line `fmt` instances, `enc_16lsd` and the `DECIMAL_PAIRS` bytes. The public API is the
+  same; the new trait items are ghost and erased.
 - **Relative to upstream** (unchanged from the first pass). `Unsigned::fmt` is generic now, so it is
   instantiated, and usually inlined, in the calling crate. Upstream compiles it once, out of line,
-  in itoa. In upstream's criterion benchmark (same machine, rustc 1.95.0, release), the first pass
-  was equal or faster in 6 of 7 cases; `u128[0]` took 1.19 ns against 1.04 ns. Code size: one `fmt`
-  instance per pair of type and buffer length. Debug builds: the removed `debug_assert!` and the
-  overflow checks in the `unsigned_abs` expression cannot fail, by the proof. Dependencies and MSRV
-  as listed above.
+  in itoa. In upstream's criterion benchmark (same machine, release), the first pass, which has the
+  same machine code as this crate, was equal or faster in 6 of 7 cases with rustc 1.95.0 (`u128[0]`
+  took 1.19 ns against 1.04 ns), and in all 7 with rustc 1.100.0 after the port (`u128[0]`: 0.56 ns
+  against 0.93 ns; the table is in `../verus/VERIFICATION.md`). Code size: one `fmt` instance per
+  pair of type and buffer length. Debug builds: the removed `debug_assert!` and the overflow checks
+  in the `unsigned_abs` expression cannot fail, by the proof. Dependencies and MSRV as listed above.
 
 ## Validation beyond the proof
 
@@ -230,21 +272,25 @@ this folder; the others are from the first pass.
   `cargo build --no-default-features`, `cargo test --tests --no-default-features` (debug and release),
   `cargo build --tests --features no-panic --release`, `cargo bench --no-run`, and
   `cargo clippy --tests --benches -- -Dclippy::all -Dclippy::pedantic`. All pass with 0 warnings;
-  `cargo doc --no-deps` too. Not run: Miri and `cargo docs-rs` (they need a nightly toolchain, which
-  is not installed here), `cargo fuzz` and `cargo outdated`.
+  `cargo doc --no-deps` too (rechecked with rustc 1.100.0 after the port). Not run: Miri and
+  `cargo docs-rs` (they need a nightly toolchain, which is not installed here), `cargo fuzz` and
+  `cargo outdated`.
 - **Differential test** (a scratch crate depending on the annotated crate and a renamed copy of
   upstream, both with `no-panic`, release): every `u8`, `i8`, `u16`, `i16`; for the wider types, all
   powers of two and ten and their neighbours, both signs, `MIN`, `MAX` and zero; and 1,000,000 random
   values of random bit length for each of `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `usize`,
   `isize`. 8,144,968 values, all formatted identically by the annotated crate, upstream and
-  `to_string`. `MAX_STR_LEN` agrees for all 12 types.
+  `to_string`. `MAX_STR_LEN` agrees for all 12 types. Rerun after the port (rustc 1.100.0, a new
+  random sample, `../verus` added): 8,134,557 values, all identical.
 - **`no-panic`.** The differential test formats `black_box`ed values of all 12 types with the
   feature enabled in release mode and links, so no panic path survives.
 
 ## Negative controls (all rejected)
 
 Each mutant is one edit (two for M16/M17) to a scratch copy. A mutant is rejected when verification
-fails, or when `--no-cheating` reports a trust marker beyond the expected two. To rerun them all:
+fails, or when `--no-cheating` reports a trust marker beyond the expected two. (For the port, the
+script's match on the `--no-cheating` message accepts the backticks that Verus 0.2026.11.22 puts
+around `--no-cheating`. Without that it found 0 trust markers and refused to run.) To rerun them all:
 `python3 negative_controls.py` from `verus_fixed/`, with `verus` on `PATH` or `VERUS=/path/to/verus`.
 M1–M20 are the first pass's (M16/M17 re-anchored, since the constants moved); M21–M28 are new.
 
@@ -287,7 +333,11 @@ three verify there (`105 verified, 0 errors`, with `--no-cheating`).
 - **Stability.** All 165 items verify with SMT seeds 0 to 39, 42 and 1234. Over seeds 0 to 9, the
   most expensive function is still `u128::fmt` (13.2M resource units median, 25.2M max, under its
   `rlimit(50)`); every other function stays at or below 11.5M (`u64`'s `fmt`). The new proofs
-  (`write`, `format`, the `spec_equiv` lemmas) each take under 0.3M.
+  (`write`, `format`, the `spec_equiv` lemmas) each take under 0.3M. With Verus 0.2026.11.22, over
+  all 42 seeds: `u128::fmt` takes 5.7M median, 7.6M max; the most expensive function is
+  `lemma_mulhi_algebra` (8.5M max, 1.2M median); every other function stays at or below 7.5M
+  (`u32`'s `fmt`); the new proofs still take under 0.3M. The `rlimit(50)` is no longer needed; it
+  was kept.
 - **Opaque predicates.** `digits_inv`, `holds` and `unchanged_outside` are `#[verifier::opaque]` and
   revealed only inside lemmas; see the first pass for why.
 - **Strings.** The `write` proofs never reason about UTF-8 directly: before calling
@@ -298,30 +348,41 @@ three verify there (`105 verified, 0 errors`, with `--no-cheating`).
 
 ### Verus findings
 
+Found with Verus 0.2026.05.03. Each was rechecked with 0.2026.11.22 (on a minimal example, or for
+the projection, in this crate); the result follows the arrow. The port kept the code's workarounds
+even where they are no longer needed.
+
 - **An associated constant used as an array length** inside `verus!`
   (`type Buffer = [MaybeUninit<u8>; Self::MAX_STR_LEN]`, or `[_; i128::MAX_STR_LEN]` once the
   `Integer` impls are verified) crashes Verus ("thir_body query … VerusErasureCtxt has not been
-  initialized"). Plain constants avoid it (the developer's workaround).
+  initialized"). Plain constants avoid it (the developer's workaround). → Fixed: both forms work.
+  The reverse broke instead: an array length in verified code that names the constant of an impl
+  Verus skips is rejected unless it goes through a type alias (the port's one change to
+  `../verus/`).
 - **A compile-time `assert!` that reads the associated constant of a verified impl**
   (`const _: () = assert!(N == <u64 as Integer>::MAX_STR_LEN)`) crashes Verus in the same way.
-  So the `usize`/`isize` constants are checked by a Verus assertion instead.
+  So the `usize`/`isize` constants are checked by a Verus assertion instead. → Fixed.
 - **An associated constant defined by projection from another impl**
   (`impl Integer for usize { const MAX_STR_LEN: usize = <u64 as Integer>::MAX_STR_LEN; }`)
   silently stops Verus from unfolding the open spec functions of the impls for `u64`, in every
   trait (`Unsigned::spec_val`, `Signed::spec_val`, `Sealed::spec_int`; likewise `isize` for `i64`).
   The `u64`/`i64` proofs of `fmt` and `write` then fail with "postcondition not satisfied" and no
-  hint of the cause. A plain constant avoids it.
+  hint of the cause. A plain constant avoids it. → Unchanged: with upstream's definition this
+  crate has 4 errors, under both versions.
 - **A verified trait cannot have an unverified supertrait**; an unverified *impl* of a verified
-  trait is fine (first pass).
+  trait is fine (first pass). → Still crashes Verus.
 - **Exec statics cannot be read in proof code**, but their `ensures` is available in the exec
-  functions that use them (first pass).
+  functions that use them (first pass). → Unchanged.
 - **Byte literals** (`b'0'`) and `debug_assert!` are unsupported; `&mut slice[range]`,
   slice-to-array `try_into`, `Rev`, `MaybeUninit::write` and `get_unchecked(_mut)` have no vstd
-  specification (first pass).
+  specification (first pass). → Byte literals, `debug_assert!` (its condition must be proved),
+  `&mut slice[range]`, `Rev`, `MaybeUninit::write` and `get_unchecked(_mut)` are supported now.
+  Slice-to-array `try_into`, `unsigned_abs` and `ilog10` are still unsupported.
 - **`--no-cheating` accepts `#[verifier::external]`** (and code outside `verus!`), so unverified
   code without a contract is invisible to it. The first pass used that to keep `--no-cheating`
   clean, at the price of leaving the public API without a contract. This folder makes the trusted
   code `external_body` instead, so that `--no-cheating` lists it and Verus checks its callers.
+  → Unchanged.
 
 ## Reproduce
 

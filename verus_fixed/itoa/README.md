@@ -34,12 +34,12 @@ Scripts in `../`:
 
 ## Reproduce
 
-Verus 0.2026.05.03.8b81855 (the bare `verus` binary with its bundled vstd). Run from this directory:
+Verus 0.2026.11.22.1ce6a59 (the bare `verus` binary with its bundled vstd). Run from this directory:
 
     verus --crate-type=lib src/lib.rs                  # 165 verified, 0 errors
     verus --crate-type=lib --no-cheating src/lib.rs    # reports exactly the 2 trusted items
 
-Normal build and the upstream tests (ghost code erased; toolchain pinned to 1.95.0 by
+Normal build and the upstream tests (ghost code erased; toolchain pinned to 1.100.0 by
 `rust-toolchain.toml`):
 
     cargo build && cargo test && cargo test --release

@@ -1,10 +1,10 @@
-# Diff of verus/itoa against upstream (itoa master @ 9339ca9, v1.0.19), generated 2026-11-09.
+# Diff of verus/itoa against upstream (itoa master @ 9339ca9, v1.0.19), generated 2026-11-09; regenerated 2026-11-23 for Verus 0.2026.11.22.
 # tests/, benches/ and the licenses are unchanged. New files (spec.rs, std_ext.rs, trusted.rs, rust-toolchain.toml) are shown in full.
 # trusted.rs holds upstream items moved out of lib.rs unchanged, except the signed `write` (check with verus/check_trusted.py).
 
 --- src/lib.rs
 +++ verus/itoa/src/lib.rs
-@@ -51,13 +51,22 @@
+@@ -51,13 +51,27 @@
      clippy::unreadable_literal
  )]
  
@@ -25,12 +25,31 @@
  use no_panic::no_panic;
 +use vstd::prelude::*;
 +
++// The type of `Buffer::bytes`. (Upstream writes it in the field. Verus rejects an associated
++// constant from an impl it skips, such as `i128::MAX_STR_LEN` in `trusted.rs`, used as an array
++// length in verified code, but accepts it through a type alias.)
++type BufferBytes = [MaybeUninit<u8>; i128::MAX_STR_LEN];
++
 +verus! {
  
  /// A correctly sized stack allocation for the formatted integer to be written
  /// into.
-@@ -99,18 +108,7 @@
-         let bytes = [MaybeUninit::<u8>::uninit(); i128::MAX_STR_LEN];
+@@ -70,7 +84,7 @@
+ /// assert_eq!(printed, "1234");
+ /// ```
+ pub struct Buffer {
+-    bytes: [MaybeUninit<u8>; i128::MAX_STR_LEN],
++    bytes: BufferBytes,
+ }
+ 
+ impl Default for Buffer {
+@@ -96,21 +110,11 @@
+     #[inline]
+     #[cfg_attr(feature = "no-panic", no_panic)]
+     pub fn new() -> Buffer {
+-        let bytes = [MaybeUninit::<u8>::uninit(); i128::MAX_STR_LEN];
++        // (Upstream: `i128::MAX_STR_LEN`; rustc infers it from the type of `Buffer::bytes`.)
++        let bytes = [MaybeUninit::<u8>::uninit(); _];
          Buffer { bytes }
      }
 -
@@ -49,7 +68,7 @@
  }
  
  /// An integer that can be written into an [`itoa::Buffer`][Buffer].
-@@ -132,135 +130,112 @@
+@@ -132,135 +136,112 @@
      }
  }
  
@@ -267,7 +286,7 @@
                  // Count the number of bytes in buf that are not initialized.
                  let mut offset = buf.len();
                  // Consume the least-significant decimals from a working copy.
-@@ -273,7 +248,16 @@
+@@ -273,7 +254,16 @@
                          > 999
                              .try_into()
                              .expect("branch is not hit for types that cannot fit 999 (u8)")
@@ -284,7 +303,7 @@
                      offset -= 4;
  
                      // pull two pairs
-@@ -283,46 +267,79 @@
+@@ -283,46 +273,79 @@
                      let quad = remain % scale;
                      remain /= scale;
                      let (pair1, pair2) = divmod100(quad as u32);
@@ -379,7 +398,7 @@
      };
  }
  
-@@ -332,117 +349,433 @@
+@@ -332,117 +355,433 @@
  impl_Unsigned!(u64);
  
  impl Unsigned for u128 {
@@ -855,7 +874,7 @@
  // Euclidean division plus remainder with constant 1E16 basically consumes 16
  // decimals from n.
  //
-@@ -453,7 +786,11 @@
+@@ -453,7 +792,11 @@
  //   Implementation, 1994, pp. 61–72
  //
  #[cfg_attr(feature = "no-panic", no_panic)]
@@ -868,7 +887,7 @@
      const D: u128 = 1_0000_0000_0000_0000;
      // The check inlines well with the caller flow.
      if n < D {
-@@ -465,8 +802,151 @@
+@@ -465,8 +808,151 @@
      const M_HIGH: u128 = 76624777043294442917917351357515459181;
      const SH_POST: u8 = 51;
  
@@ -1212,14 +1231,14 @@
  repository = "https://github.com/dtolnay/itoa"
 -rust-version = "1.68"
 +# Upstream: 1.68. The `vstd` crate (needed for the `verus!` macro) requires a recent toolchain.
-+rust-version = "1.95"
++rust-version = "1.100"
 +publish = false
  
  [dependencies]
  no-panic = { version = "0.1", optional = true }
 +# Only for the normal (non-Verus) build: provides the `verus!` macro, which erases the ghost
 +# code. Verification uses the `verus` binary with its bundled vstd.
-+vstd = { version = "=0.0.0-2026-05-06-1803", default-features = false }
++vstd = { version = "=0.0.0-2026-11-22-0344", default-features = false }
  
  [target.'cfg(not(miri))'.dev-dependencies]
  criterion = { version = "0.8", default-features = false }
@@ -2292,5 +2311,5 @@
 +++ verus/itoa/rust-toolchain.toml
 @@ -0,0 +1,3 @@
 +[toolchain]
-+channel = "1.95.0"
++channel = "1.100.0"
 +components = ["rustc", "rust-std", "cargo", "rustfmt"]

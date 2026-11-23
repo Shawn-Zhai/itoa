@@ -1,5 +1,6 @@
-# Hand edits in verus_fixed/ relative to verus/ (2026-11-13). Generated files (upstream.diff) and the reports
-# (VERIFICATION.md, rewritten; SPEC_REVIEW.md, new) are left out.
+# Hand edits in verus_fixed/ relative to verus/ (2026-11-13; regenerated 2026-11-23, after both were ported to Verus
+# 0.2026.11.22). Generated files (upstream.diff) and the reports (VERIFICATION.md, rewritten; SPEC_REVIEW.md, new)
+# are left out.
 
 diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/check_trusted.py verus_fixed/check_trusted.py
 --- verus/check_trusted.py	2026-11-09 22:44:17.627634327 -0500
@@ -149,8 +150,8 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
 +print(f'{failures} unexpected changes')
  sys.exit(1 if failures else 0)
 diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/README.md verus_fixed/itoa/README.md
---- verus/itoa/README.md	2026-11-09 22:45:59.500055849 -0500
-+++ verus_fixed/itoa/README.md	2026-11-13 02:23:14.162946104 -0500
+--- verus/itoa/README.md	2026-11-23 05:30:50.534086317 -0500
++++ verus_fixed/itoa/README.md	2026-11-23 05:30:50.534086317 -0500
 @@ -1,32 +1,43 @@
 -# `itoa` annotated for Verus
 +# `itoa` annotated for Verus (amended)
@@ -203,13 +204,13 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
  
  ## Reproduce
  
- Verus 0.2026.05.03.8b81855 (the bare `verus` binary with its bundled vstd). Run from this directory:
+ Verus 0.2026.11.22.1ce6a59 (the bare `verus` binary with its bundled vstd). Run from this directory:
  
 -    verus --crate-type=lib --no-cheating src/lib.rs        # 105 verified, 0 errors
 +    verus --crate-type=lib src/lib.rs                  # 165 verified, 0 errors
 +    verus --crate-type=lib --no-cheating src/lib.rs    # reports exactly the 2 trusted items
  
- Normal build and the upstream tests (ghost code erased; toolchain pinned to 1.95.0 by
+ Normal build and the upstream tests (ghost code erased; toolchain pinned to 1.100.0 by
  `rust-toolchain.toml`):
 diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/src/human_spec.rs verus_fixed/itoa/src/human_spec.rs
 --- verus/itoa/src/human_spec.rs	1969-12-31 19:00:00.000000000 -0500
@@ -304,9 +305,9 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
 +
 +} // verus!
 diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/itoa/src/lib.rs verus_fixed/itoa/src/lib.rs
---- verus/itoa/src/lib.rs	2026-11-09 22:58:18.249458381 -0500
-+++ verus_fixed/itoa/src/lib.rs	2026-11-13 02:25:20.891679428 -0500
-@@ -50,21 +50,47 @@
+--- verus/itoa/src/lib.rs	2026-11-23 05:18:00.316031730 -0500
++++ verus_fixed/itoa/src/lib.rs	2026-11-23 05:30:44.514528878 -0500
+@@ -50,26 +50,47 @@
      clippy::needless_doctest_main,
      clippy::unreadable_literal
  )]
@@ -351,18 +352,24 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
  #[cfg(feature = "no-panic")]
  use no_panic::no_panic;
  use vstd::prelude::*;
+-
+-// The type of `Buffer::bytes`. (Upstream writes it in the field. Verus rejects an associated
+-// constant from an impl it skips, such as `i128::MAX_STR_LEN` in `trusted.rs`, used as an array
+-// length in verified code, but accepts it through a type alias.)
+-type BufferBytes = [MaybeUninit<u8>; i128::MAX_STR_LEN];
 +#[cfg(verus_keep_ghost)]
 +use vstd::utf8::is_ascii_chars_encode_utf8;
  
  verus! {
  
-@@ -79,12 +105,18 @@
+@@ -84,12 +105,19 @@
  /// assert_eq!(printed, "1234");
  /// ```
  pub struct Buffer {
--    bytes: [MaybeUninit<u8>; i128::MAX_STR_LEN],
-+    // (Upstream: `i128::MAX_STR_LEN`, the same constant. Verus crashes on an associated constant
-+    // used as an array length, so array lengths use the plain constants of `private`.)
+-    bytes: BufferBytes,
++    // (Upstream: `i128::MAX_STR_LEN`, the same constant. Verus 0.2026.05.03 crashed on an
++    // associated constant used as an array length, so array lengths use the plain constants of
++    // `private`.)
 +    bytes: [MaybeUninit<u8>; private::I128_MAX_STR_LEN],
  }
  
@@ -377,7 +384,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
          Buffer::new()
      }
  }
-@@ -94,21 +126,59 @@
+@@ -99,22 +127,59 @@
  #[allow(clippy::non_canonical_clone_impl)]
  impl Clone for Buffer {
      #[inline]
@@ -402,7 +409,8 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
      #[inline]
      #[cfg_attr(feature = "no-panic", no_panic)]
 -    pub fn new() -> Buffer {
--        let bytes = [MaybeUninit::<u8>::uninit(); i128::MAX_STR_LEN];
+-        // (Upstream: `i128::MAX_STR_LEN`; rustc infers it from the type of `Buffer::bytes`.)
+-        let bytes = [MaybeUninit::<u8>::uninit(); _];
 +    pub fn new() -> (result: Buffer)
 +        ensures
 +            // Human spec
@@ -441,7 +449,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
  }
  
  /// An integer that can be written into an [`itoa::Buffer`][Buffer].
-@@ -118,23 +188,209 @@
+@@ -124,23 +189,210 @@
      /// The maximum length of string that formatting an integer of this type can
      /// produce on the current target platform.
      const MAX_STR_LEN: usize;
@@ -463,8 +471,9 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
 +    #[cfg(verus_keep_ghost)]
 +    use vstd::prelude::*;
 +
-+    // `MAX_STR_LEN` of each type, as a plain constant: Verus crashes on an associated constant
-+    // used as an array length (see `SPEC_REVIEW.md`). `impl_Integer!` checks each one against
++    // `MAX_STR_LEN` of each type, as a plain constant: Verus cannot evaluate upstream's `ilog10`,
++    // and Verus 0.2026.05.03 crashed on an associated constant used as an array length (see
++    // `SPEC_REVIEW.md`). `impl_Integer!` checks each one against
 +    // upstream's definition (`MAX.ilog10() + 1`, or `+ 2` for the signed types) at compile time.
 +    pub const U8_MAX_STR_LEN: usize = 3;
 +    pub const I8_MAX_STR_LEN: usize = 4;
@@ -655,7 +664,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
  
  verus! {
  
-@@ -169,6 +425,9 @@
+@@ -175,6 +427,9 @@
      ensures
          r.0 == value / 100,
          r.1 == value % 100,
@@ -665,7 +674,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
  {
      const EXP: u32 = 19; // 19 is faster or equal to 12 even for 3 digits.
      const SIG: u32 = (1 << EXP) / 100 + 1;
-@@ -219,6 +478,9 @@
+@@ -225,6 +480,9 @@
              offset + dec(self.spec_val()).len() == N,
              holds(final(buf)@, offset as int, dec(self.spec_val())),
              unchanged_outside(final(buf)@, old(buf)@, offset as int, N as int),
@@ -675,7 +684,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
      ;
  }
  
-@@ -235,6 +497,7 @@
+@@ -241,6 +499,7 @@
                  let ghost v = self as nat;
                  proof {
                      lemma_digits_start(v, N as nat, buf@);
@@ -683,7 +692,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
                  }
                  // Count the number of bytes in buf that are not initialized.
                  let mut offset = buf.len();
-@@ -362,6 +625,7 @@
+@@ -368,6 +627,7 @@
          let ghost v = self as nat;
          proof {
              lemma_digits_start(v, N as nat, buf@);
@@ -691,7 +700,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
          }
          // Optimize common-case zero, which would also need special treatment due to
          // its "leading" zero.
-@@ -653,6 +917,8 @@
+@@ -659,6 +919,8 @@
          final(buf)@.len() == old(buf)@.len(),
          holds(final(buf)@, offset as int, dec_pad(n as nat, 16)),
          unchanged_outside(final(buf)@, old(buf)@, offset as int, offset + 16),
@@ -700,7 +709,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
  {
      // Consume the least-significant decimals from a working copy.
      let mut remain = n;
-@@ -790,6 +1056,9 @@
+@@ -796,6 +1058,9 @@
      ensures
          r.0 == n / 1_0000_0000_0000_0000,
          r.1 == n % 1_0000_0000_0000_0000,
@@ -710,7 +719,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
  {
      const D: u128 = 1_0000_0000_0000_0000;
      // The check inlines well with the caller flow.
-@@ -892,44 +1161,45 @@
+@@ -898,44 +1163,45 @@
  
  // ===== MAX_STR_LEN =====
  //
@@ -1279,7 +1288,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
 +} // verus!
 diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--exclude=upstream.diff' '--exclude=amendments.diff' '--exclude=VERIFICATION.md' '--exclude=SPEC_REVIEW.md' '--exclude=__pycache__' '--exclude=.verus-log' '--exclude=.verus-solver-log' verus/negative_controls.py verus_fixed/negative_controls.py
 --- verus/negative_controls.py	2026-11-09 22:41:11.317532211 -0500
-+++ verus_fixed/negative_controls.py	2026-11-13 02:17:03.050294199 -0500
++++ verus_fixed/negative_controls.py	2026-11-23 05:19:47.354046447 -0500
 @@ -1,7 +1,12 @@
  #!/usr/bin/env python3
  """Negative controls: inject one bug at a time into a scratch copy of itoa/src and check that
@@ -1364,7 +1373,7 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
       '                // Format per two digits from the lookup table.\n                if remain > 9 {\n'
       '                    let ghost (offset0, remain0, buf0) = (offset as nat, remain as nat, buf@);\n'
       '                    proof {\n                        lemma_pow10_values();\n'
-@@ -46,84 +71,123 @@
+@@ -46,84 +71,124 @@
       '                // Format per two digits from the lookup table.\n                if remain > 10 {\n'
       '                    let ghost (offset0, remain0, buf0) = (offset as nat, remain as nat, buf@);\n'
       '                    proof {\n                        lemma_pow10_values();\n'
@@ -1496,7 +1505,8 @@ diff -ruN '--exclude=target' '--exclude=Cargo.lock' '--exclude=liblib.rlib' '--e
 +    _, out_nc = run(root, '--no-cheating')
 +    markers, lines = [], out_nc.splitlines()
 +    for i, line in enumerate(lines):
-+        if line.startswith('error') and 'not allowed with --no-cheating' in line:
++        # (Verus 0.2026.11.22 writes "`--no-cheating`"; 0.2026.05.03 wrote it without backticks.)
++        if line.startswith('error') and re.search(r'not allowed with `?--no-cheating', line):
 +            loc = re.search(r'--> (\S+):(\d+)', '\n'.join(lines[i + 1:i + 3]))
 +            markers.append((loc.group(1), ' '.join(lines[i + 3:i + 4]).strip()) if loc else ('?', line))
 +    return verified, (errors[0] if errors else '(no error line)'), markers

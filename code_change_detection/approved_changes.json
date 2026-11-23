@@ -5,7 +5,7 @@
     "fingerprint": "054348132b611b58",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "vstd prelude (provides the `verus!` macro; no vstd function runs), the std_ext stand-ins, the two trusted functions, and per-module imports of the new modules (spec, human_spec, spec_equiv are ghost only and empty in a normal build). `core::str` moved with `slice_buffer_to_str` into trusted.rs."
+    "agent_note": "Follows the moved and added items: `use core::str` moved with `slice_buffer_to_str` to `trusted.rs`; imports of the stand-ins (`std_ext`) and of `buffer_of`/`slice_buffer_to_str` (`trusted`); `use vstd::prelude::*` in each module for the `verus!` macro, which erases ghost code and adds no run-time code; and the imports of the new ghost modules (spec, human_spec, spec_equiv), whose contents erase to nothing."
   },
   {
     "key": "const I128_MAX_STR_LEN",
@@ -13,7 +13,7 @@
     "fingerprint": "97752e2e98d22a3f",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `40`, the length of `-170141183460469231731687303715884105728` (`i128::MIN`, with its sign). Used for `i128::MAX_STR_LEN` and the `i128` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #5`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const I16_MAX_STR_LEN",
@@ -21,7 +21,7 @@
     "fingerprint": "3d08b8275ae9d9f1",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `6`, the length of `-32768` (`i16::MIN`, with its sign). Used for `i16::MAX_STR_LEN` and the `i16` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #2`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const I32_MAX_STR_LEN",
@@ -29,7 +29,7 @@
     "fingerprint": "bdc5d1467d02dfbd",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `11`, the length of `-2147483648` (`i32::MIN`, with its sign). Used for `i32::MAX_STR_LEN` and the `i32` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #3`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const I64_MAX_STR_LEN",
@@ -37,7 +37,7 @@
     "fingerprint": "c8dc1cf626e8f1f5",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `20`, the length of `-9223372036854775808` (`i64::MIN`, with its sign). Used for `i64::MAX_STR_LEN` and the `i64` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #4`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const I8_MAX_STR_LEN",
@@ -45,7 +45,7 @@
     "fingerprint": "fda0e877237595ed",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `4`, the length of `-128` (`i8::MIN`, with its sign). Used for `i8::MAX_STR_LEN` and the `i8` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #1`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const U128_MAX_STR_LEN",
@@ -53,7 +53,7 @@
     "fingerprint": "a813411d73ed9de4",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `39`, the length of `340282366920938463463374607431768211455` (`u128::MAX`). Used for `u128::MAX_STR_LEN` and the `u128` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #5`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const U16_MAX_STR_LEN",
@@ -61,7 +61,7 @@
     "fingerprint": "4be45f7e9084265a",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `5`, the length of `65535` (`u16::MAX`). Used for `u16::MAX_STR_LEN` and the `u16` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #2`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const U32_MAX_STR_LEN",
@@ -69,7 +69,7 @@
     "fingerprint": "f8de60e2c7d30b3e",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `10`, the length of `4294967295` (`u32::MAX`). Used for `u32::MAX_STR_LEN` and the `u32` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #3`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const U64_MAX_STR_LEN",
@@ -77,7 +77,7 @@
     "fingerprint": "091d6d578b5fcf9f",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `20`, the length of `18446744073709551615` (`u64::MAX`). Used for `u64::MAX_STR_LEN` and the `u64` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #4`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const U8_MAX_STR_LEN",
@@ -85,7 +85,7 @@
     "fingerprint": "268dd37a4b331260",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`."
+    "agent_note": "New plain constant `3`, the length of `255` (`u8::MAX`). Used for `u8::MAX_STR_LEN` and the `u8` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #1`). Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "const _ #1",
@@ -93,7 +93,7 @@
     "fingerprint": "45d8059defe7c215",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged."
+    "agent_note": "Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U8_MAX_STR_LEN == u8::MAX.ilog10() as usize + 1` and `private::I8_MAX_STR_LEN == i8::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code."
   },
   {
     "key": "const _ #2",
@@ -101,7 +101,7 @@
     "fingerprint": "1bff9fa8ed6eaf1a",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged."
+    "agent_note": "Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U16_MAX_STR_LEN == u16::MAX.ilog10() as usize + 1` and `private::I16_MAX_STR_LEN == i16::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code."
   },
   {
     "key": "const _ #3",
@@ -109,7 +109,7 @@
     "fingerprint": "0d4d35f1ed46b0de",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged."
+    "agent_note": "Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U32_MAX_STR_LEN == u32::MAX.ilog10() as usize + 1` and `private::I32_MAX_STR_LEN == i32::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code."
   },
   {
     "key": "const _ #4",
@@ -117,7 +117,7 @@
     "fingerprint": "c926700d2d155b20",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged."
+    "agent_note": "Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U64_MAX_STR_LEN == u64::MAX.ilog10() as usize + 1` and `private::I64_MAX_STR_LEN == i64::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code."
   },
   {
     "key": "const _ #5",
@@ -125,7 +125,7 @@
     "fingerprint": "7215a52266bffd4d",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged."
+    "agent_note": "Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U128_MAX_STR_LEN == u128::MAX.ilog10() as usize + 1` and `private::I128_MAX_STR_LEN == i128::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code."
   },
   {
     "key": "crate attributes",
@@ -133,7 +133,7 @@
     "fingerprint": "64b221e074df5daf",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "A second `#![allow(...)]` for four clippy lints that only the Verus annotations trigger (erased proof blocks, `#[inline(always)]` stand-ins, the long annotated `u128::fmt`, and `ref_as_ptr`, which clippy applies once `rust-version` >= 1.76). Lint configuration only; no effect on the compiled code. Needed for upstream's clippy CI step (C4 in SPEC_REVIEW.md)."
+    "agent_note": "A second `#![allow(...)]` for four clippy lints that only the annotations trigger: `inline_always` (the stand-ins and `buffer_of`), `ref_as_ptr` (upstream's `slice_buffer_to_str` body, once `rust-version` is 1.76 or later), `semicolon_if_nothing_returned` (erased `proof` blocks) and `too_many_lines` (`u128::fmt`). Lint configuration only; no effect on the compiled code."
   },
   {
     "key": "fn buffer_of",
@@ -141,7 +141,7 @@
     "fingerprint": "ed996cc07c8c9475",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New trusted function (`external_body`): upstream's two statements from `format` (`self.bytes.as_mut_ptr().cast::<I::Buffer>()`, `&mut *buf_ptr`), with `self.bytes` passed as `bytes`. check_trusted.py compares it with upstream."
+    "agent_note": "Upstream's two statements from `Buffer::format` (`let buf_ptr = self.bytes.as_mut_ptr().cast::<I::Buffer>();` and `unsafe { &mut *buf_ptr }`), moved verbatim into a `#[inline(always)]` function so that the rest of `format` is verified. A safe `pub(crate)` function, as the code was in the safe `format`: sound for every `I: Integer` because `Integer` is sealed and every `I::Buffer` is an array of at most 40 `MaybeUninit<u8>` (alignment 1), so the cast stays inside the 40-byte buffer."
   },
   {
     "key": "fn divmod100",
@@ -149,7 +149,7 @@
     "fingerprint": "37842bef70e86340",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`debug_assert!(value < 10_000)` removed (panic macros are unsupported). It is the precondition `requires value < 10_000`, proved at every call site, so the check could not fail."
+    "agent_note": "Only change: upstream's `debug_assert!(value < 10_000)` is removed (Verus 0.2026.05.03 did not support it; 0.2026.11.22 does) and is now the precondition `requires value < 10_000`, which Verus proves at every call; `divmod100` is private, so all callers are verified. Release builds are identical; debug builds lose a check that cannot fail."
   },
   {
     "key": "fn enc_16lsd",
@@ -157,7 +157,7 @@
     "fingerprint": "7d3693ee881cdffb",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Const generic `OFFSET` -> parameter `offset` (it would be `N - 16`, a generic constant expression stable Rust rejects); `for quad_index in (1..4).rev()` -> a `while` loop visiting 3, 2, 1; `*DECIMAL_PAIRS.0.get_unchecked(j)` -> the verified stand-in; `buf[i].write(v)` -> `buf[i] = MaybeUninit::new(v)` (what `write` does, minus the discarded reference). Same writes, same order."
+    "agent_note": "The const generic `OFFSET` becomes the run-time parameter `offset` (it would have to be `N - 16`, a generic constant expression, which stable Rust rejects). `u128::fmt` passes `N - 16` and `N - 32`, the same positions as upstream's `u128::MAX_STR_LEN - 16`/`- 32` on its 39-byte (sub)buffer. `for quad_index in (1..4).rev()` becomes a `while` loop visiting 3, 2, 1 in the same order (Verus 0.2026.05.03 did not support `Rev`; 0.2026.11.22 does). `get_unchecked` becomes the verified stand-in, and `buf[i].write(v)` becomes `buf[i] = MaybeUninit::new(v)` (what `write` does; itoa discards its return value); the indexing stays bounds-checked as upstream. Same bytes written to the same positions."
   },
   {
     "key": "fn get_unchecked",
@@ -165,7 +165,7 @@
     "fingerprint": "604a1d7269e57237",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New verified stand-in for `<[T]>::get_unchecked` (unspecified in vstd): indexes with a bounds check behind a branch to `unreachable_unchecked` that Verus proves dead, so the optimizer drops the check."
+    "agent_note": "Verified stand-in for upstream's `<[T]>::get_unchecked(index)` on `DECIMAL_PAIRS.0`. For `index < N` it returns `&array[index]`, the same element; for `index >= N` it hits `unreachable_unchecked`, so the bounds check is optimized away. Out of bounds is UB in both versions; Verus proves it never happens (`requires index < N` at every call). (Verus 0.2026.11.22 now specifies `get_unchecked` directly; the stand-in was kept.)"
   },
   {
     "key": "fn slice_buffer_to_str",
@@ -173,7 +173,7 @@
     "fingerprint": "85c7d6ab0d87ef16",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Visibility `pub(crate)`, because it moved into module `trusted`; the body is upstream's, verbatim (check_trusted.py)."
+    "agent_note": "Body token-identical to upstream. The function moved to `trusted.rs` (it is trusted, see the `external_body` entry), so its visibility widens from private to `pub(crate)` for the calls from `lib.rs`; still not public API."
   },
   {
     "key": "fn write_unchecked",
@@ -181,7 +181,7 @@
     "fingerprint": "6f5c7454c511236e",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New verified stand-in for `get_unchecked_mut(i).write(v)`; same scheme as `get_unchecked`."
+    "agent_note": "Verified stand-in for upstream's `buf.get_unchecked_mut(index).write(value)`. For `index < N` it assigns `MaybeUninit::new(value)` to `array[index]`, which is what `MaybeUninit::write` does (itoa discards the returned reference); for `index >= N` it hits `unreachable_unchecked`, so the bounds check is optimized away. Out of bounds is UB in both versions; Verus proves it never happens (`requires index < N` at every call)."
   },
   {
     "key": "impl Buffer :: fn format",
@@ -189,7 +189,7 @@
     "fingerprint": "ce67519b46d0072e",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "The raw-pointer cast moved into the trusted `buffer_of` (`#[inline(always)]`), so the rest of `format`, including the `unreachable_unchecked` length check, is verified. Release assembly of `format` is identical to the first pass for all 12 types."
+    "agent_note": "The raw-pointer cast (`let buf_ptr = ...cast::<I::Buffer>();` and `&mut *buf_ptr`) moves into the trusted, `#[inline(always)]` `buffer_of`, so the rest of `format` is verified, including that the `string.len() > I::MAX_STR_LEN` branch to `unreachable_unchecked` is dead. Same statements in the same order; the length check and its `unreachable_unchecked` are unchanged."
   },
   {
     "key": "impl Buffer :: fn new",
@@ -197,7 +197,7 @@
     "fingerprint": "1b31b2efb4b4f33a",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN` (both 40)."
+    "agent_note": "Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN`, both 40: the same array. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl Integer for i128 :: const MAX_STR_LEN",
@@ -205,7 +205,7 @@
     "fingerprint": "e4b579e442f8ed27",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`i128::MAX.ilog10() as usize + 2` -> `private::I128_MAX_STR_LEN` (40, the length of `-170141183460469231731687303715884105728`). The same value: `const _ #5` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for i16 :: const MAX_STR_LEN",
@@ -213,7 +213,7 @@
     "fingerprint": "1f7efda856276926",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`i16::MAX.ilog10() as usize + 2` -> `private::I16_MAX_STR_LEN` (6, the length of `-32768`). The same value: `const _ #2` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for i32 :: const MAX_STR_LEN",
@@ -221,7 +221,7 @@
     "fingerprint": "2d429dff82b2c9e6",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`i32::MAX.ilog10() as usize + 2` -> `private::I32_MAX_STR_LEN` (11, the length of `-2147483648`). The same value: `const _ #3` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for i64 :: const MAX_STR_LEN",
@@ -229,7 +229,7 @@
     "fingerprint": "763a897f96910079",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`i64::MAX.ilog10() as usize + 2` -> `private::I64_MAX_STR_LEN` (20, the length of `-9223372036854775808`). The same value: `const _ #4` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for i8 :: const MAX_STR_LEN",
@@ -237,7 +237,7 @@
     "fingerprint": "414f44f5ccc106ff",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`i8::MAX.ilog10() as usize + 2` -> `private::I8_MAX_STR_LEN` (4, the length of `-128`). The same value: `const _ #1` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for isize :: const MAX_STR_LEN",
@@ -245,7 +245,7 @@
     "fingerprint": "e71f6b9d0182b63f",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`<u64|i64 as Integer>::MAX_STR_LEN` -> the same plain constant (20). A Verus assertion in `lemma_max_str_len` proves the two equal; defining it by projection silently broke Verus's proofs for u64/i64 (VERIFICATION.md, Verus findings)."
+    "agent_note": "`<i64 as Integer>::MAX_STR_LEN` -> `private::I64_MAX_STR_LEN` (20), the same value. This is the 64-bit invocation (`impl_Integer_size!(isize as i64, ...)`); the 16- and 32-bit invocations (lib.rs:390-393) pass `I16_MAX_STR_LEN` and `I32_MAX_STR_LEN`, matching upstream's primitives, but are not compiled on this host. Checked by a Verus assertion (`Self::MAX_STR_LEN == <i64 as Integer>::MAX_STR_LEN`, 64-bit only); there is no compile-time assert. Upstream's projection was avoided because a constant defined by projection stops Verus from unfolding the spec functions of the `i64` impls (still the case in Verus 0.2026.11.22)."
   },
   {
     "key": "impl Integer for u128 :: const MAX_STR_LEN",
@@ -253,7 +253,7 @@
     "fingerprint": "46ca6a2599f1a954",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`u128::MAX.ilog10() as usize + 1` -> `private::U128_MAX_STR_LEN` (39, the length of `340282366920938463463374607431768211455`). The same value: `const _ #5` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for u16 :: const MAX_STR_LEN",
@@ -261,7 +261,7 @@
     "fingerprint": "941232739e173c0f",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`u16::MAX.ilog10() as usize + 1` -> `private::U16_MAX_STR_LEN` (5, the length of `65535`). The same value: `const _ #2` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for u32 :: const MAX_STR_LEN",
@@ -269,7 +269,7 @@
     "fingerprint": "1547faae6e8a48d3",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`u32::MAX.ilog10() as usize + 1` -> `private::U32_MAX_STR_LEN` (10, the length of `4294967295`). The same value: `const _ #3` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for u64 :: const MAX_STR_LEN",
@@ -277,7 +277,7 @@
     "fingerprint": "1d022d464bccd379",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`u64::MAX.ilog10() as usize + 1` -> `private::U64_MAX_STR_LEN` (20, the length of `18446744073709551615`). The same value: `const _ #4` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for u8 :: const MAX_STR_LEN",
@@ -285,7 +285,7 @@
     "fingerprint": "9f2272406516f654",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert."
+    "agent_note": "`u8::MAX.ilog10() as usize + 1` -> `private::U8_MAX_STR_LEN` (3, the length of `255`). The same value: `const _ #1` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`."
   },
   {
     "key": "impl Integer for usize :: const MAX_STR_LEN",
@@ -293,7 +293,7 @@
     "fingerprint": "a47c5b005d5d94df",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`<u64|i64 as Integer>::MAX_STR_LEN` -> the same plain constant (20). A Verus assertion in `lemma_max_str_len` proves the two equal; defining it by projection silently broke Verus's proofs for u64/i64 (VERIFICATION.md, Verus findings)."
+    "agent_note": "`<u64 as Integer>::MAX_STR_LEN` -> `private::U64_MAX_STR_LEN` (20), the same value. This is the 64-bit invocation (`impl_Integer_size!(usize as u64, ...)`); the 16- and 32-bit invocations (lib.rs:390-393) pass `U16_MAX_STR_LEN` and `U32_MAX_STR_LEN`, matching upstream's primitives, but are not compiled on this host. Checked by a Verus assertion (`Self::MAX_STR_LEN == <u64 as Integer>::MAX_STR_LEN`, 64-bit only); there is no compile-time assert. Upstream's projection was avoided because a constant defined by projection stops Verus from unfolding the spec functions of the `u64` impls (still the case in Verus 0.2026.11.22)."
   },
   {
     "key": "impl Signed for i128",
@@ -301,7 +301,7 @@
     "fingerprint": "89360ff533b5f562",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New impl of the private trait `Signed` (one per signed type)."
+    "agent_note": "New impl of the crate-private trait `Signed` for `i128` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i128 :: fn fmt`."
   },
   {
     "key": "impl Signed for i128 :: fn fmt",
@@ -309,7 +309,7 @@
     "fingerprint": "24c94e1faa1ad425",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u128 + 1 } else { self as u128 }`: exact for every value, including `i128::MIN` (-(MIN + 1) = MAX, cast to `u128`, plus 1 = 2^127); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i128` `write` entry for why the positions and offset equal upstream's."
   },
   {
     "key": "impl Signed for i16",
@@ -317,7 +317,7 @@
     "fingerprint": "482172496ddb2da0",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New impl of the private trait `Signed` (one per signed type)."
+    "agent_note": "New impl of the crate-private trait `Signed` for `i16` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i16 :: fn fmt`."
   },
   {
     "key": "impl Signed for i16 :: fn fmt",
@@ -325,7 +325,7 @@
     "fingerprint": "fcd54e1bff87aaea",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u16 + 1 } else { self as u16 }`: exact for every value, including `i16::MIN` (-(MIN + 1) = MAX, cast to `u16`, plus 1 = 2^15); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i16` `write` entry for why the positions and offset equal upstream's."
   },
   {
     "key": "impl Signed for i32",
@@ -333,7 +333,7 @@
     "fingerprint": "4f63850df89650df",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New impl of the private trait `Signed` (one per signed type)."
+    "agent_note": "New impl of the crate-private trait `Signed` for `i32` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i32 :: fn fmt`."
   },
   {
     "key": "impl Signed for i32 :: fn fmt",
@@ -341,7 +341,7 @@
     "fingerprint": "25a532f988a319fd",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u32 + 1 } else { self as u32 }`: exact for every value, including `i32::MIN` (-(MIN + 1) = MAX, cast to `u32`, plus 1 = 2^31); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i32` `write` entry for why the positions and offset equal upstream's."
   },
   {
     "key": "impl Signed for i64",
@@ -349,7 +349,7 @@
     "fingerprint": "f1b8cec8515df1e5",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New impl of the private trait `Signed` (one per signed type)."
+    "agent_note": "New impl of the crate-private trait `Signed` for `i64` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i64 :: fn fmt`."
   },
   {
     "key": "impl Signed for i64 :: fn fmt",
@@ -357,7 +357,7 @@
     "fingerprint": "a9ac3aa1490672e8",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u64 + 1 } else { self as u64 }`: exact for every value, including `i64::MIN` (-(MIN + 1) = MAX, cast to `u64`, plus 1 = 2^63); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i64` `write` entry for why the positions and offset equal upstream's."
   },
   {
     "key": "impl Signed for i8",
@@ -365,7 +365,7 @@
     "fingerprint": "f0c316d39440312d",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New impl of the private trait `Signed` (one per signed type)."
+    "agent_note": "New impl of the crate-private trait `Signed` for `i8` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i8 :: fn fmt`."
   },
   {
     "key": "impl Signed for i8 :: fn fmt",
@@ -373,7 +373,7 @@
     "fingerprint": "50dce60bdf8b2dfc",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u8 + 1 } else { self as u8 }`: exact for every value, including `i8::MIN` (-(MIN + 1) = MAX, cast to `u8`, plus 1 = 2^7); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i8` `write` entry for why the positions and offset equal upstream's."
   },
   {
     "key": "impl Unsigned for u128 :: fn fmt",
@@ -381,7 +381,7 @@
     "fingerprint": "44075f6c1034fcec",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "As for u8..u64 `fmt`, plus: `u128::MAX_STR_LEN` -> `N` (the buffer length; 39 for u128, 40 when called from i128), `enc_16lsd::<{..}>(buf, x)` -> `enc_16lsd(buf, N - 16, x)`, and the zero case `buf[offset].write(b'0')` -> `buf[offset] = MaybeUninit::new(48)`."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). `u128::MAX_STR_LEN` becomes `N` (5 places): for `u128`'s own buffer N = 39, upstream's value; on `i128`'s buffer (N = 40) every position shifts by one, exactly as upstream's tail subslice starting at 1 does. The `enc_16lsd` calls pass the offset as an argument (`N - 16`, `N - 32`). The zero case writes `MaybeUninit::new(48)` at `buf.len() - 1` (checked index, as upstream). `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow)."
   },
   {
     "key": "impl Unsigned for u16 :: fn fmt",
@@ -389,7 +389,7 @@
     "fingerprint": "485792657bb9e07a",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u16`'s own buffer (N = 5, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i16`'s buffer (N = 6) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow)."
   },
   {
     "key": "impl Unsigned for u32 :: fn fmt",
@@ -397,7 +397,7 @@
     "fingerprint": "485792657bb9e07a",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u32`'s own buffer (N = 10, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i32`'s buffer (N = 11) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow)."
   },
   {
     "key": "impl Unsigned for u64 :: fn fmt",
@@ -405,7 +405,7 @@
     "fingerprint": "485792657bb9e07a",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u64`'s own buffer (N = 20, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i64`'s buffer (N = 20) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow)."
   },
   {
     "key": "impl Unsigned for u8 :: fn fmt",
@@ -413,7 +413,7 @@
     "fingerprint": "485792657bb9e07a",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u8`'s own buffer (N = 3, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i8`'s buffer (N = 4) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow)."
   },
   {
     "key": "impl private :: Sealed for i128 :: fn write",
@@ -421,7 +421,7 @@
     "fingerprint": "716019a5c32c89e7",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i128`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 40, U = 39) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged."
   },
   {
     "key": "impl private :: Sealed for i128 :: type Buffer",
@@ -429,7 +429,7 @@
     "fingerprint": "26b8e12178b78cc5",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN` (40), the value of `i128::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 40]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl private :: Sealed for i16 :: fn write",
@@ -437,7 +437,7 @@
     "fingerprint": "f6541f7abe398f19",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i16`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 6, U = 5) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged."
   },
   {
     "key": "impl private :: Sealed for i16 :: type Buffer",
@@ -445,7 +445,7 @@
     "fingerprint": "1a8a20ca07cac2d4",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::I16_MAX_STR_LEN` (6), the value of `i16::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 6]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl private :: Sealed for i32 :: fn write",
@@ -453,7 +453,7 @@
     "fingerprint": "9d33fa12b0ad6840",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i32`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 11, U = 10) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged."
   },
   {
     "key": "impl private :: Sealed for i32 :: type Buffer",
@@ -461,7 +461,7 @@
     "fingerprint": "ff8c86e6c45f789e",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::I32_MAX_STR_LEN` (11), the value of `i32::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 11]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl private :: Sealed for i64 :: fn write",
@@ -469,7 +469,7 @@
     "fingerprint": "f5e16a4fd004da34",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i64`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 20, U = 20) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Here S = U = 20, so upstream's tail is the whole buffer, and the `'-'` fits only because |i64::MIN| = 2^63 has 19 digits; Verus proves this."
   },
   {
     "key": "impl private :: Sealed for i64 :: type Buffer",
@@ -477,7 +477,7 @@
     "fingerprint": "d1abe49ec7c47d25",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::I64_MAX_STR_LEN` (20), the value of `i64::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 20]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl private :: Sealed for i8 :: fn write",
@@ -485,7 +485,7 @@
     "fingerprint": "800733311b030d24",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i8`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 4, U = 3) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged."
   },
   {
     "key": "impl private :: Sealed for i8 :: type Buffer",
@@ -493,7 +493,7 @@
     "fingerprint": "aa0f218b31c29451",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::I8_MAX_STR_LEN` (4), the value of `i8::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 4]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl private :: Sealed for u128 :: type Buffer",
@@ -501,7 +501,7 @@
     "fingerprint": "36035e9850913be9",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::U128_MAX_STR_LEN` (39), the value of `u128::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 39]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl private :: Sealed for u16 :: type Buffer",
@@ -509,7 +509,7 @@
     "fingerprint": "928dedecf6a21c5a",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::U16_MAX_STR_LEN` (5), the value of `u16::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 5]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl private :: Sealed for u32 :: type Buffer",
@@ -517,7 +517,7 @@
     "fingerprint": "b7263b7cb4b32bbf",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::U32_MAX_STR_LEN` (10), the value of `u32::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 10]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl private :: Sealed for u64 :: type Buffer",
@@ -525,7 +525,7 @@
     "fingerprint": "70139a7e5d6b7964",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::U64_MAX_STR_LEN` (20), the value of `u64::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 20]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "impl private :: Sealed for u8 :: type Buffer",
@@ -533,7 +533,7 @@
     "fingerprint": "d124adcc8c498053",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length."
+    "agent_note": "Array length `Self::MAX_STR_LEN` -> `private::U8_MAX_STR_LEN` (3), the value of `u8::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 3]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "static DECIMAL_PAIRS",
@@ -541,7 +541,7 @@
     "fingerprint": "63a01278b26c8d9d",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Byte string `*b\"0001...99\"` -> the same 200 bytes as a numeric array (Verus has no byte literals; Verus proves the table equals `decimal_pairs()`); initializer wrapped in a block by `exec static`. Same value."
+    "agent_note": "The byte string `*b\"0001...99\"` becomes a numeric array literal (Verus 0.2026.05.03 did not support byte literals; 0.2026.11.22 does), with each row's string in a comment. Checked mechanically: the 200 numbers are byte-for-byte upstream's bytes. `exec static ... ensures ...` erases to a plain `static` whose initializer is the block `{ DecimalPairs([...]) }`, the same constant; `#[rustfmt::skip]` only affects formatting. `DecimalPairs` keeps `#[repr(C, align(2))]`."
   },
   {
     "key": "struct Buffer",
@@ -549,7 +549,7 @@
     "fingerprint": "74e8cdf919ee15d3",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN` (both 40): same type. Same reason as `type Buffer`."
+    "agent_note": "Field type `[MaybeUninit<u8>; i128::MAX_STR_LEN]` -> `[MaybeUninit<u8>; private::I128_MAX_STR_LEN]`, both 40: the same type and layout. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted."
   },
   {
     "key": "trait Signed",
@@ -557,7 +557,7 @@
     "fingerprint": "8609eb14f3d1f7e6",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New private trait for the signed formatting (upstream had it inline in `write`)."
+    "agent_note": "New crate-private trait (not public API) with one method, `fmt`: the signed formatting that upstream had inline in `write`, moved out so it is verified as its own function (first pass). Doc comment only besides the signature."
   },
   {
     "key": "trait Unsigned",
@@ -565,7 +565,7 @@
     "fingerprint": "b1ae4f5e7e602c1c",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`fn fmt(self, buf: &mut Self::Buffer)` -> generic over the array length `N` (see the impls), plus a doc comment."
+    "agent_note": "Crate-private trait. `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, plus a doc comment explaining why. The implementations write right-aligned from `buf.len()`, so the digits depend only on the end of the buffer."
   },
   {
     "key": "imports",
@@ -573,7 +573,7 @@
     "fingerprint": "596f7a5d2bcd7966",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "vstd prelude (provides the `verus!` macro; no vstd function runs), the std_ext stand-ins, the two trusted functions, and per-module imports of the new modules (spec, human_spec, spec_equiv are ghost only and empty in a normal build). `core::str` moved with `slice_buffer_to_str` into trusted.rs."
+    "agent_note": "Follows the moved and added items: `use core::str` moved with `slice_buffer_to_str` to `trusted.rs`; imports of the stand-ins (`std_ext`) and of `buffer_of`/`slice_buffer_to_str` (`trusted`); `use vstd::prelude::*` in each module for the `verus!` macro, which erases ghost code and adds no run-time code; and the imports of the new ghost modules (spec, human_spec, spec_equiv), whose contents erase to nothing. Under `--all-features`, `trusted.rs` also imports `no_panic`, for the `no_panic` attribute that `slice_buffer_to_str` keeps."
   },
   {
     "key": "fn enc_16lsd",
@@ -581,7 +581,7 @@
     "fingerprint": "31827da48143be04",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Const generic `OFFSET` -> parameter `offset` (it would be `N - 16`, a generic constant expression stable Rust rejects); `for quad_index in (1..4).rev()` -> a `while` loop visiting 3, 2, 1; `*DECIMAL_PAIRS.0.get_unchecked(j)` -> the verified stand-in; `buf[i].write(v)` -> `buf[i] = MaybeUninit::new(v)` (what `write` does, minus the discarded reference). Same writes, same order."
+    "agent_note": "The const generic `OFFSET` becomes the run-time parameter `offset` (it would have to be `N - 16`, a generic constant expression, which stable Rust rejects). `u128::fmt` passes `N - 16` and `N - 32`, the same positions as upstream's `u128::MAX_STR_LEN - 16`/`- 32` on its 39-byte (sub)buffer. `for quad_index in (1..4).rev()` becomes a `while` loop visiting 3, 2, 1 in the same order (Verus 0.2026.05.03 did not support `Rev`; 0.2026.11.22 does). `get_unchecked` becomes the verified stand-in, and `buf[i].write(v)` becomes `buf[i] = MaybeUninit::new(v)` (what `write` does; itoa discards its return value); the indexing stays bounds-checked as upstream. Same bytes written to the same positions. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry. The wrapper also rebinds the new parameter (`let offset = offset;`)."
   },
   {
     "key": "fn slice_buffer_to_str",
@@ -589,7 +589,7 @@
     "fingerprint": "dd8f5678fde411d2",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Visibility `pub(crate)`, because it moved into module `trusted`; the body is upstream's, verbatim (check_trusted.py)."
+    "agent_note": "Body token-identical to upstream. The function moved to `trusted.rs` (it is trusted, see the `external_body` entry), so its visibility widens from private to `pub(crate)` for the calls from `lib.rs`; still not public API. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl Buffer :: fn format",
@@ -597,7 +597,7 @@
     "fingerprint": "7f3b02940aacd54a",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "The raw-pointer cast moved into the trusted `buffer_of` (`#[inline(always)]`), so the rest of `format`, including the `unreachable_unchecked` length check, is verified. Release assembly of `format` is identical to the first pass for all 12 types."
+    "agent_note": "The raw-pointer cast (`let buf_ptr = ...cast::<I::Buffer>();` and `&mut *buf_ptr`) moves into the trusted, `#[inline(always)]` `buffer_of`, so the rest of `format` is verified, including that the `string.len() > I::MAX_STR_LEN` branch to `unreachable_unchecked` is dead. Same statements in the same order; the length check and its `unreachable_unchecked` are unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl Buffer :: fn new",
@@ -605,7 +605,7 @@
     "fingerprint": "81608c02364c07fb",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN` (both 40)."
+    "agent_note": "Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN`, both 40: the same array. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl Signed for i128 :: fn fmt",
@@ -613,7 +613,7 @@
     "fingerprint": "2f46e31a5f45741d",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u128 + 1 } else { self as u128 }`: exact for every value, including `i128::MIN` (-(MIN + 1) = MAX, cast to `u128`, plus 1 = 2^127); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i128` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains."
   },
   {
     "key": "impl Signed for i16 :: fn fmt",
@@ -621,7 +621,7 @@
     "fingerprint": "7083c52f479e30ad",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u16 + 1 } else { self as u16 }`: exact for every value, including `i16::MIN` (-(MIN + 1) = MAX, cast to `u16`, plus 1 = 2^15); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i16` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains."
   },
   {
     "key": "impl Signed for i32 :: fn fmt",
@@ -629,7 +629,7 @@
     "fingerprint": "a994aea1815a4249",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u32 + 1 } else { self as u32 }`: exact for every value, including `i32::MIN` (-(MIN + 1) = MAX, cast to `u32`, plus 1 = 2^31); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i32` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains."
   },
   {
     "key": "impl Signed for i64 :: fn fmt",
@@ -637,7 +637,7 @@
     "fingerprint": "7be8956895b0bf30",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u64 + 1 } else { self as u64 }`: exact for every value, including `i64::MIN` (-(MIN + 1) = MAX, cast to `u64`, plus 1 = 2^63); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i64` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains."
   },
   {
     "key": "impl Signed for i8 :: fn fmt",
@@ -645,7 +645,7 @@
     "fingerprint": "1f9ba26f3ea5dd0e",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified."
+    "agent_note": "Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u8 + 1 } else { self as u8 }`: exact for every value, including `i8::MIN` (-(MIN + 1) = MAX, cast to `u8`, plus 1 = 2^7); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i8` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains."
   },
   {
     "key": "impl Unsigned for u128 :: fn fmt",
@@ -653,7 +653,7 @@
     "fingerprint": "f18b56a7df2fb0f6",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "As for u8..u64 `fmt`, plus: `u128::MAX_STR_LEN` -> `N` (the buffer length; 39 for u128, 40 when called from i128), `enc_16lsd::<{..}>(buf, x)` -> `enc_16lsd(buf, N - 16, x)`, and the zero case `buf[offset].write(b'0')` -> `buf[offset] = MaybeUninit::new(48)`."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). `u128::MAX_STR_LEN` becomes `N` (5 places): for `u128`'s own buffer N = 39, upstream's value; on `i128`'s buffer (N = 40) every position shifts by one, exactly as upstream's tail subslice starting at 1 does. The `enc_16lsd` calls pass the offset as an argument (`N - 16`, `N - 32`). The zero case writes `MaybeUninit::new(48)` at `buf.len() - 1` (checked index, as upstream). `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl Unsigned for u16 :: fn fmt",
@@ -661,7 +661,7 @@
     "fingerprint": "69ca568537e41136",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u16`'s own buffer (N = 5, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i16`'s buffer (N = 6) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl Unsigned for u32 :: fn fmt",
@@ -669,7 +669,7 @@
     "fingerprint": "69ca568537e41136",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u32`'s own buffer (N = 10, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i32`'s buffer (N = 11) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl Unsigned for u64 :: fn fmt",
@@ -677,7 +677,7 @@
     "fingerprint": "69ca568537e41136",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u64`'s own buffer (N = 20, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i64`'s buffer (N = 20) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl Unsigned for u8 :: fn fmt",
@@ -685,7 +685,7 @@
     "fingerprint": "69ca568537e41136",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset."
+    "agent_note": "Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u8`'s own buffer (N = 3, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i8`'s buffer (N = 4) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl private :: Sealed for i128 :: fn write",
@@ -693,7 +693,7 @@
     "fingerprint": "9f12aa2c2b9f2fc2",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i128`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 40, U = 39) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl private :: Sealed for i16 :: fn write",
@@ -701,7 +701,7 @@
     "fingerprint": "c95ad023b5480e27",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i16`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 6, U = 5) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl private :: Sealed for i32 :: fn write",
@@ -709,7 +709,7 @@
     "fingerprint": "482ffd81eda94a17",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i32`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 11, U = 10) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl private :: Sealed for i64 :: fn write",
@@ -717,7 +717,7 @@
     "fingerprint": "31a4c29fdbc85767",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i64`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 20, U = 20) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Here S = U = 20, so upstream's tail is the whole buffer, and the `'-'` fits only because |i64::MIN| = 2^63 has 19 digits; Verus proves this. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "impl private :: Sealed for i8 :: fn write",
@@ -725,23 +725,23 @@
     "fingerprint": "c0fc8e25fa57b990",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset."
+    "agent_note": "The formatting moves into the verified `Signed::fmt` (`impl Signed for i8`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 4, U = 3) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry."
   },
   {
     "key": "file Cargo.toml",
     "status": "changed",
-    "fingerprint": "b88ab8aea71d7ed6",
+    "fingerprint": "516a1251be194489",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "`vstd` dependency (default-features off; provides the `verus!` macro, no run-time calls), `rust-version` 1.68 -> 1.95 (vstd needs it), `publish = false`, description, and `unexpected_cfgs` allowing `verus_keep_ghost`."
+    "agent_note": "Build configuration only: the `vstd` dependency `=0.0.0-2026-11-22-0344` (default features off, so still `no_std`; provides the `verus!` macro, which erases ghost code; no vstd function is called at run time), `rust-version` 1.68 -> 1.100 (the toolchain of Verus 0.2026.11.22), `publish = false`, the description, and `unexpected_cfgs` allowing `verus_keep_ghost`/`verus_only`. Observable to users as a higher MSRV and one more dependency; no change to the compiled code."
   },
   {
     "key": "file rust-toolchain.toml",
     "status": "added",
-    "fingerprint": "a0b175a09ecfd5e8",
+    "fingerprint": "3d205b47623b7385",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "New: pins rustc 1.95.0, the toolchain of the bundled Verus."
+    "agent_note": "New file: pins rustc 1.100.0, the toolchain Verus 0.2026.11.22 uses, for normal builds of the annotated crate. Build configuration only."
   },
   {
     "key": "trust src/lib.rs: #[cfg(verus_keep_ghost)] mod verified_examples;",
@@ -749,7 +749,7 @@
     "fingerprint": "06dc29a0525a0057",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Verified example clients, compiled only under Verus; nothing calls them."
+    "agent_note": "Ghost-only module of verified examples (e.g. `format(128u64)` is `\"128\"`), compiled only under Verus. Normal builds do not contain it, and it makes nothing trusted."
   },
   {
     "key": "trust src/lib.rs: #[cfg(verus_keep_ghost)] pub use crate::human_spec::*;",
@@ -757,7 +757,7 @@
     "fingerprint": "918cfda75fb35d34",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
+    "agent_note": "Under Verus only, re-exports the developer's spec functions at the crate root, where the developer defined them. Compiled out of normal builds, so the public API is unchanged; an import makes nothing trusted."
   },
   {
     "key": "trust src/lib.rs: #[cfg(verus_keep_ghost)] use crate::spec::*;",
@@ -765,7 +765,7 @@
     "fingerprint": "12bffc5947115fd4",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`crate::spec::*`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
   },
   {
     "key": "trust src/lib.rs: #[cfg(verus_keep_ghost)] use crate::spec_equiv::*;",
@@ -773,7 +773,7 @@
     "fingerprint": "8271d2ff64c10ce6",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`crate::spec_equiv::*`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
   },
   {
     "key": "trust src/lib.rs: #[cfg(verus_keep_ghost)] use vstd::utf8::is_ascii_chars_encode_utf8;",
@@ -781,135 +781,7 @@
     "fingerprint": "8bec49eadc8bd113",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/lib.rs: #[cfg(verus_keep_ghost)] use crate::human_spec::*;",
-    "status": "trust marker",
-    "fingerprint": "d17e99076ebabb9c",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/lib.rs: #[cfg(verus_keep_ghost)] use vstd::prelude::*;",
-    "status": "trust marker",
-    "fingerprint": "f35d100275f3db5c",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/spec.rs: #[cfg(verus_keep_ghost)] use vstd::arithmetic::div_mod::{",
-    "status": "trust marker",
-    "fingerprint": "3dcfb6e6667c0a05",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/spec.rs: #[cfg(verus_keep_ghost)] use vstd::arithmetic::mul::lemma_mul_inequality;",
-    "status": "trust marker",
-    "fingerprint": "229ed1428cab8b8e",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/spec.rs: #[cfg(verus_keep_ghost)] use vstd::raw_ptr::MemContents;",
-    "status": "trust marker",
-    "fingerprint": "ca6fe0602684acbd",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use crate::trusted::suffix_bytes;",
-    "status": "trust marker",
-    "fingerprint": "7d469d9f57bc8b02",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use vstd::raw_ptr::MemContents;",
-    "status": "trust marker",
-    "fingerprint": "0c174de43f41e74d",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use vstd::string::{is_ascii, StringSliceAdditionalSpecFns};",
-    "status": "trust marker",
-    "fingerprint": "f33ca93c853761a6",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use vstd::utf8::{",
-    "status": "trust marker",
-    "fingerprint": "4fdaac58c060cd79",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/std_ext.rs: #[cfg(verus_keep_ghost)] use vstd::raw_ptr::MemContents;",
-    "status": "trust marker",
-    "fingerprint": "d2e01619dd4990cc",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/trusted.rs: #[cfg(verus_keep_ghost)] use crate::human_spec::initialized_ascii_suffix;",
-    "status": "trust marker",
-    "fingerprint": "cb03db42fd001fca",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/trusted.rs: #[cfg(verus_keep_ghost)] use vstd::string::StringSliceAdditionalSpecFns;",
-    "status": "trust marker",
-    "fingerprint": "897ecbd04a025f1a",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it."
-  },
-  {
-    "key": "trust src/trusted.rs: #[verifier::external_body] pub(crate) fn buffer_of<I: Integer>(bytes: &mut [MaybeUninit<u8>; private::I128_MAX_STR_LEN]) -> &mut I::Buffer {",
-    "status": "trust marker",
-    "fingerprint": "421565cfe33b89c4",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Trusted item T1 (raw-pointer cast); see SPEC_REVIEW.md."
-  },
-  {
-    "key": "trust src/trusted.rs: unsafe { &mut *buf_ptr }",
-    "status": "trust marker",
-    "fingerprint": "807f06ee043a03c5",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Upstream's cast, now in `buffer_of` (T1)."
-  },
-  {
-    "key": "trust src/trusted.rs: #[verifier::external_body] pub(crate) unsafe fn slice_buffer_to_str(buf: &[MaybeUninit<u8>], offset: usize) -> (result: &str)",
-    "status": "trust marker",
-    "fingerprint": "36f4e1450c70eabf",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "Trusted item T3; contract: the developer's precondition and `result.spec_bytes() == suffix_bytes(buf@, offset)`."
-  },
-  {
-    "key": "trust src/trusted.rs: pub(crate) unsafe fn slice_buffer_to_str(buf: &[MaybeUninit<u8>], offset: usize) -> (result: &str)",
-    "status": "trust marker",
-    "fingerprint": "a907e8ec33aedd06",
-    "reviewer": "Shawn",
-    "note": "",
-    "agent_note": "The signature line of T3 (upstream's, plus `pub(crate)` and a named result for the contract)."
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::utf8::is_ascii_chars_encode_utf8`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
   },
   {
     "key": "trust more often than upstream: unsafe { hint::unreachable_unchecked() };",
@@ -917,6 +789,134 @@
     "fingerprint": "cd8dbf1dc48076cd",
     "reviewer": "Shawn",
     "note": "",
-    "agent_note": "Upstream has this line once, in `format`; it is still there (src/lib.rs). The two copies in std_ext.rs are the out-of-bounds branches of the verified stand-ins `get_unchecked` and `write_unchecked`. Verus specifies `unreachable_unchecked` with `requires false` and proves all three unreachable: `index < N` is the stand-ins' precondition, checked at every call."
+    "agent_note": "3 occurrences, upstream has 1. Upstream's, in `format` (lib.rs:179), is unchanged and now verified dead. The two in std_ext.rs (28, 50) are the out-of-bounds branches of `get_unchecked` and `write_unchecked`. vstd specifies `unreachable_unchecked` with `requires false`, so Verus proves each one unreachable at every call."
+  },
+  {
+    "key": "trust src/lib.rs: #[cfg(verus_keep_ghost)] use crate::human_spec::*;",
+    "status": "trust marker",
+    "fingerprint": "d17e99076ebabb9c",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`crate::human_spec::*`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/lib.rs: #[cfg(verus_keep_ghost)] use vstd::prelude::*;",
+    "status": "trust marker",
+    "fingerprint": "f35d100275f3db5c",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::prelude::*`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/spec.rs: #[cfg(verus_keep_ghost)] use vstd::arithmetic::div_mod::{",
+    "status": "trust marker",
+    "fingerprint": "3dcfb6e6667c0a05",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::arithmetic::div_mod::`...) used only by specifications and proofs in `src/spec.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/spec.rs: #[cfg(verus_keep_ghost)] use vstd::arithmetic::mul::lemma_mul_inequality;",
+    "status": "trust marker",
+    "fingerprint": "229ed1428cab8b8e",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::arithmetic::mul::lemma_mul_inequality`) used only by specifications and proofs in `src/spec.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/spec.rs: #[cfg(verus_keep_ghost)] use vstd::raw_ptr::MemContents;",
+    "status": "trust marker",
+    "fingerprint": "ca6fe0602684acbd",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::raw_ptr::MemContents`) used only by specifications and proofs in `src/spec.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use crate::trusted::suffix_bytes;",
+    "status": "trust marker",
+    "fingerprint": "7d469d9f57bc8b02",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`crate::trusted::suffix_bytes`) used only by specifications and proofs in `src/spec_equiv.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use vstd::raw_ptr::MemContents;",
+    "status": "trust marker",
+    "fingerprint": "0c174de43f41e74d",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::raw_ptr::MemContents`) used only by specifications and proofs in `src/spec_equiv.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use vstd::string::{is_ascii, StringSliceAdditionalSpecFns};",
+    "status": "trust marker",
+    "fingerprint": "f33ca93c853761a6",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::string::{is_ascii, StringSliceAdditionalSpecFns}`) used only by specifications and proofs in `src/spec_equiv.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use vstd::utf8::{",
+    "status": "trust marker",
+    "fingerprint": "4fdaac58c060cd79",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::utf8::`...) used only by specifications and proofs in `src/spec_equiv.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/std_ext.rs: #[cfg(verus_keep_ghost)] use vstd::raw_ptr::MemContents;",
+    "status": "trust marker",
+    "fingerprint": "d2e01619dd4990cc",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::raw_ptr::MemContents`) used only by specifications and proofs in `src/std_ext.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/trusted.rs: #[cfg(verus_keep_ghost)] use crate::human_spec::initialized_ascii_suffix;",
+    "status": "trust marker",
+    "fingerprint": "cb03db42fd001fca",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`crate::human_spec::initialized_ascii_suffix`) used only by specifications and proofs in `src/trusted.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/trusted.rs: #[cfg(verus_keep_ghost)] use vstd::string::StringSliceAdditionalSpecFns;",
+    "status": "trust marker",
+    "fingerprint": "897ecbd04a025f1a",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "`#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::string::StringSliceAdditionalSpecFns`) used only by specifications and proofs in `src/trusted.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted."
+  },
+  {
+    "key": "trust src/trusted.rs: #[verifier::external_body] pub(crate) fn buffer_of<I: Integer>(bytes: &mut [MaybeUninit<u8>; private::I128_MAX_STR_LEN]) -> &mut I::Buffer {",
+    "status": "trust marker",
+    "fingerprint": "421565cfe33b89c4",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "Trusted (T1): Verus does not check the body, which is upstream's cast from `format` (2 statements; check_trusted.py checks it). No `ensures`, so Verus assumes nothing about the returned buffer; `write`'s contract holds for any buffer. Obligation, by inspection: every `I::Buffer` is an array of at most 40 `MaybeUninit<u8>` (Verus proves `I::MAX_STR_LEN <= 40` in `Integer::lemma_max_str_len`), so the cast stays inside the buffer."
+  },
+  {
+    "key": "trust src/trusted.rs: unsafe { &mut *buf_ptr }",
+    "status": "trust marker",
+    "fingerprint": "807f06ee043a03c5",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "Upstream's `unsafe { &mut *buf_ptr }` from `format` (where it was the argument of `i.write(...)`), now the last expression of `buffer_of`. Same count overall: one, as upstream."
+  },
+  {
+    "key": "trust src/trusted.rs: #[verifier::external_body] pub(crate) unsafe fn slice_buffer_to_str(buf: &[MaybeUninit<u8>], offset: usize) -> (result: &str)",
+    "status": "trust marker",
+    "fingerprint": "36f4e1450c70eabf",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "Trusted (T3): Verus does not check the body (upstream's, verbatim; check_trusted.py checks it) and assumes its contract: `requires offset <= buf.len()` and the developer's `initialized_ascii_suffix(buf, offset)`, `ensures result.spec_bytes() == suffix_bytes(buf@, offset)` (the string is the initialized bytes `buf[offset..]`). The contract matches the body: `get_unchecked(offset..)` needs `offset <= len`, reading the elements as `u8` needs them initialized, and `from_utf8_unchecked` needs valid UTF-8, which ASCII is. Verus proves the precondition at every call (the `write` methods)."
+  },
+  {
+    "key": "trust src/trusted.rs: pub(crate) unsafe fn slice_buffer_to_str(buf: &[MaybeUninit<u8>], offset: usize) -> (result: &str)",
+    "status": "trust marker",
+    "fingerprint": "a907e8ec33aedd06",
+    "reviewer": "Shawn",
+    "note": "",
+    "agent_note": "The signature line of `slice_buffer_to_str`: upstream's `unsafe fn`, now `pub(crate)` (moved to `trusted.rs`) and naming its result `(result: &str)` for the `ensures`, which the `verus!` macro erases. Not a new `unsafe`: upstream's function is `unsafe fn` too."
   }
 ]

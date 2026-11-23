@@ -105,8 +105,9 @@ verus! {
 /// assert_eq!(printed, "1234");
 /// ```
 pub struct Buffer {
-    // (Upstream: `i128::MAX_STR_LEN`, the same constant. Verus crashes on an associated constant
-    // used as an array length, so array lengths use the plain constants of `private`.)
+    // (Upstream: `i128::MAX_STR_LEN`, the same constant. Verus 0.2026.05.03 crashed on an
+    // associated constant used as an array length, so array lengths use the plain constants of
+    // `private`.)
     bytes: [MaybeUninit<u8>; private::I128_MAX_STR_LEN],
 }
 
@@ -206,8 +207,9 @@ mod private {
     #[cfg(verus_keep_ghost)]
     use vstd::prelude::*;
 
-    // `MAX_STR_LEN` of each type, as a plain constant: Verus crashes on an associated constant
-    // used as an array length (see `SPEC_REVIEW.md`). `impl_Integer!` checks each one against
+    // `MAX_STR_LEN` of each type, as a plain constant: Verus cannot evaluate upstream's `ilog10`,
+    // and Verus 0.2026.05.03 crashed on an associated constant used as an array length (see
+    // `SPEC_REVIEW.md`). `impl_Integer!` checks each one against
     // upstream's definition (`MAX.ilog10() + 1`, or `+ 2` for the signed types) at compile time.
     pub const U8_MAX_STR_LEN: usize = 3;
     pub const I8_MAX_STR_LEN: usize = 4;

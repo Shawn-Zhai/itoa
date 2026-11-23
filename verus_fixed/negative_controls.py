@@ -148,7 +148,8 @@ def check(root):
     _, out_nc = run(root, '--no-cheating')
     markers, lines = [], out_nc.splitlines()
     for i, line in enumerate(lines):
-        if line.startswith('error') and 'not allowed with --no-cheating' in line:
+        # (Verus 0.2026.11.22 writes "`--no-cheating`"; 0.2026.05.03 wrote it without backticks.)
+        if line.startswith('error') and re.search(r'not allowed with `?--no-cheating', line):
             loc = re.search(r'--> (\S+):(\d+)', '\n'.join(lines[i + 1:i + 3]))
             markers.append((loc.group(1), ' '.join(lines[i + 3:i + 4]).strip()) if loc else ('?', line))
     return verified, (errors[0] if errors else '(no error line)'), markers

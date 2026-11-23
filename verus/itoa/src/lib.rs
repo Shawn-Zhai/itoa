@@ -66,6 +66,11 @@ use core::mem::{self, MaybeUninit};
 use no_panic::no_panic;
 use vstd::prelude::*;
 
+// The type of `Buffer::bytes`. (Upstream writes it in the field. Verus rejects an associated
+// constant from an impl it skips, such as `i128::MAX_STR_LEN` in `trusted.rs`, used as an array
+// length in verified code, but accepts it through a type alias.)
+type BufferBytes = [MaybeUninit<u8>; i128::MAX_STR_LEN];
+
 verus! {
 
 /// A correctly sized stack allocation for the formatted integer to be written
@@ -79,7 +84,7 @@ verus! {
 /// assert_eq!(printed, "1234");
 /// ```
 pub struct Buffer {
-    bytes: [MaybeUninit<u8>; i128::MAX_STR_LEN],
+    bytes: BufferBytes,
 }
 
 impl Default for Buffer {
@@ -105,7 +110,8 @@ impl Buffer {
     #[inline]
     #[cfg_attr(feature = "no-panic", no_panic)]
     pub fn new() -> Buffer {
-        let bytes = [MaybeUninit::<u8>::uninit(); i128::MAX_STR_LEN];
+        // (Upstream: `i128::MAX_STR_LEN`; rustc infers it from the type of `Buffer::bytes`.)
+        let bytes = [MaybeUninit::<u8>::uninit(); _];
         Buffer { bytes }
     }
     // `Buffer::format` is in `trusted.rs`.

@@ -1,4 +1,4 @@
-# Diff of verus_fixed/itoa against upstream (itoa master @ 9339ca9, v1.0.19), generated 2026-11-13.
+# Diff of verus_fixed/itoa against upstream (itoa master @ 9339ca9, v1.0.19), generated 2026-11-13; regenerated 2026-11-23 for Verus 0.2026.11.22.
 # tests/, benches/ and the licenses are unchanged. New files (spec.rs, std_ext.rs, trusted.rs, human_spec.rs,
 # spec_equiv.rs, verified_examples.rs, rust-toolchain.toml) are shown in full.
 # trusted.rs holds upstream code: the body of slice_buffer_to_str and the cast of Buffer::format (check with
@@ -58,13 +58,14 @@
  
  /// A correctly sized stack allocation for the formatted integer to be written
  /// into.
-@@ -70,12 +105,18 @@
+@@ -70,12 +105,19 @@
  /// assert_eq!(printed, "1234");
  /// ```
  pub struct Buffer {
 -    bytes: [MaybeUninit<u8>; i128::MAX_STR_LEN],
-+    // (Upstream: `i128::MAX_STR_LEN`, the same constant. Verus crashes on an associated constant
-+    // used as an array length, so array lengths use the plain constants of `private`.)
++    // (Upstream: `i128::MAX_STR_LEN`, the same constant. Verus 0.2026.05.03 crashed on an
++    // associated constant used as an array length, so array lengths use the plain constants of
++    // `private`.)
 +    bytes: [MaybeUninit<u8>; private::I128_MAX_STR_LEN],
  }
  
@@ -79,7 +80,7 @@
          Buffer::new()
      }
  }
-@@ -85,27 +126,54 @@
+@@ -85,27 +127,54 @@
  #[allow(clippy::non_canonical_clone_impl)]
  impl Clone for Buffer {
      #[inline]
@@ -140,7 +141,7 @@
          if string.len() > I::MAX_STR_LEN {
              unsafe { hint::unreachable_unchecked() };
          }
-@@ -120,147 +188,317 @@
+@@ -120,147 +189,318 @@
      /// The maximum length of string that formatting an integer of this type can
      /// produce on the current target platform.
      const MAX_STR_LEN: usize;
@@ -162,8 +163,9 @@
 +    #[cfg(verus_keep_ghost)]
 +    use vstd::prelude::*;
 +
-+    // `MAX_STR_LEN` of each type, as a plain constant: Verus crashes on an associated constant
-+    // used as an array length (see `SPEC_REVIEW.md`). `impl_Integer!` checks each one against
++    // `MAX_STR_LEN` of each type, as a plain constant: Verus cannot evaluate upstream's `ilog10`,
++    // and Verus 0.2026.05.03 crashed on an associated constant used as an array length (see
++    // `SPEC_REVIEW.md`). `impl_Integer!` checks each one against
 +    // upstream's definition (`MAX.ilog10() + 1`, or `+ 2` for the signed types) at compile time.
 +    pub const U8_MAX_STR_LEN: usize = 3;
 +    pub const I8_MAX_STR_LEN: usize = 4;
@@ -513,7 +515,7 @@
                  // Count the number of bytes in buf that are not initialized.
                  let mut offset = buf.len();
                  // Consume the least-significant decimals from a working copy.
-@@ -273,7 +511,16 @@
+@@ -273,7 +513,16 @@
                          > 999
                              .try_into()
                              .expect("branch is not hit for types that cannot fit 999 (u8)")
@@ -530,7 +532,7 @@
                      offset -= 4;
  
                      // pull two pairs
-@@ -283,46 +530,79 @@
+@@ -283,46 +532,79 @@
                      let quad = remain % scale;
                      remain /= scale;
                      let (pair1, pair2) = divmod100(quad as u32);
@@ -625,7 +627,7 @@
      };
  }
  
-@@ -332,117 +612,436 @@
+@@ -332,117 +614,436 @@
  impl_Unsigned!(u64);
  
  impl Unsigned for u128 {
@@ -1104,7 +1106,7 @@
  // Euclidean division plus remainder with constant 1E16 basically consumes 16
  // decimals from n.
  //
-@@ -453,7 +1052,14 @@
+@@ -453,7 +1054,14 @@
  //   Implementation, 1994, pp. 61–72
  //
  #[cfg_attr(feature = "no-panic", no_panic)]
@@ -1120,7 +1122,7 @@
      const D: u128 = 1_0000_0000_0000_0000;
      // The check inlines well with the caller flow.
      if n < D {
-@@ -465,8 +1071,152 @@
+@@ -465,8 +1073,152 @@
      const M_HIGH: u128 = 76624777043294442917917351357515459181;
      const SH_POST: u8 = 51;
  
@@ -1467,14 +1469,14 @@
  repository = "https://github.com/dtolnay/itoa"
 -rust-version = "1.68"
 +# Upstream: 1.68. The `vstd` crate (needed for the `verus!` macro) requires a recent toolchain.
-+rust-version = "1.95"
++rust-version = "1.100"
 +publish = false
  
  [dependencies]
  no-panic = { version = "0.1", optional = true }
 +# Only for the normal (non-Verus) build: provides the `verus!` macro, which erases the ghost
 +# code. Verification uses the `verus` binary with its bundled vstd.
-+vstd = { version = "=0.0.0-2026-05-06-1803", default-features = false }
++vstd = { version = "=0.0.0-2026-11-22-0344", default-features = false }
  
  [target.'cfg(not(miri))'.dev-dependencies]
  criterion = { version = "0.8", default-features = false }
@@ -2871,5 +2873,5 @@
 +++ verus_fixed/itoa/rust-toolchain.toml
 @@ -0,0 +1,3 @@
 +[toolchain]
-+channel = "1.95.0"
++channel = "1.100.0"
 +components = ["rustc", "rust-std", "cargo", "rustfmt"]

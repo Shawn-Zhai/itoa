@@ -10,7 +10,7 @@ macro's definition, and the invocation); they are looked up after the comparison
 
 - Upstream: `..`
 - Annotated: `../verus_fixed/itoa`
-- Toolchain: `1.95.0`; configurations: `--no-default-features`, `--all-features`
+- Toolchain: `1.100.0`; configurations: `--no-default-features`, `--all-features`
 
 | finding | count | unreviewed |
 |---|---|---|
@@ -24,11 +24,11 @@ macro's definition, and the invocation); they are looked up after the comparison
 ### `const _ #1`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged.  
+Agent's explanation (to be checked): Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U8_MAX_STR_LEN == u8::MAX.ilog10() as usize + 1` and `private::I8_MAX_STR_LEN == i8::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `45d8059defe7c215`  
 Source: [src/lib.rs:137-141](../src/lib.rs#L137-L141) in `impl_Integer!`, invoked at [src/lib.rs:185](../src/lib.rs#L185)  
-Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `impl_Integer!`, invoked at [src/lib.rs:340](../verus_fixed/itoa/src/lib.rs#L340)
+Annotated: [src/lib.rs:249-256](../verus_fixed/itoa/src/lib.rs#L249-L256) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)
 
 ```diff
 --- upstream
@@ -52,11 +52,11 @@ Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `im
 ### `const _ #2`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged.  
+Agent's explanation (to be checked): Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U16_MAX_STR_LEN == u16::MAX.ilog10() as usize + 1` and `private::I16_MAX_STR_LEN == i16::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `1bff9fa8ed6eaf1a`  
 Source: [src/lib.rs:137-141](../src/lib.rs#L137-L141) in `impl_Integer!`, invoked at [src/lib.rs:186](../src/lib.rs#L186)  
-Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `impl_Integer!`, invoked at [src/lib.rs:341](../verus_fixed/itoa/src/lib.rs#L341)
+Annotated: [src/lib.rs:249-256](../verus_fixed/itoa/src/lib.rs#L249-L256) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)
 
 ```diff
 --- upstream
@@ -80,11 +80,11 @@ Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `im
 ### `const _ #3`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged.  
+Agent's explanation (to be checked): Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U32_MAX_STR_LEN == u32::MAX.ilog10() as usize + 1` and `private::I32_MAX_STR_LEN == i32::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `0d4d35f1ed46b0de`  
 Source: [src/lib.rs:137-141](../src/lib.rs#L137-L141) in `impl_Integer!`, invoked at [src/lib.rs:187](../src/lib.rs#L187)  
-Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)
+Annotated: [src/lib.rs:249-256](../verus_fixed/itoa/src/lib.rs#L249-L256) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)
 
 ```diff
 --- upstream
@@ -108,11 +108,11 @@ Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `im
 ### `const _ #4`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged.  
+Agent's explanation (to be checked): Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U64_MAX_STR_LEN == u64::MAX.ilog10() as usize + 1` and `private::I64_MAX_STR_LEN == i64::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `c926700d2d155b20`  
 Source: [src/lib.rs:137-141](../src/lib.rs#L137-L141) in `impl_Integer!`, invoked at [src/lib.rs:188](../src/lib.rs#L188)  
-Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)
+Annotated: [src/lib.rs:249-256](../verus_fixed/itoa/src/lib.rs#L249-L256) in `impl_Integer!`, invoked at [src/lib.rs:345](../verus_fixed/itoa/src/lib.rs#L345)
 
 ```diff
 --- upstream
@@ -136,11 +136,11 @@ Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `im
 ### `const _ #5`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Two compile-time asserts added: the plain `MAX_STR_LEN` constants of `private` must equal upstream's formula (`MAX.ilog10() + 1`, `+ 2` for signed). Evaluated by rustc at compile time; no run-time code. The three upstream asserts are unchanged.  
+Agent's explanation (to be checked): Two compile-time `assert!`s added to the `const _` block that upstream already has (its three asserts are unchanged): `private::U128_MAX_STR_LEN == u128::MAX.ilog10() as usize + 1` and `private::I128_MAX_STR_LEN == i128::MAX.ilog10() as usize + 2`, i.e. the plain constants equal upstream's definitions. Evaluated by rustc during compilation (a mismatch fails the build); no run-time code.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `7215a52266bffd4d`  
 Source: [src/lib.rs:137-141](../src/lib.rs#L137-L141) in `impl_Integer!`, invoked at [src/lib.rs:189](../src/lib.rs#L189)  
-Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)
+Annotated: [src/lib.rs:249-256](../verus_fixed/itoa/src/lib.rs#L249-L256) in `impl_Integer!`, invoked at [src/lib.rs:346](../verus_fixed/itoa/src/lib.rs#L346)
 
 ```diff
 --- upstream
@@ -164,7 +164,7 @@ Annotated: [src/lib.rs:247-254](../verus_fixed/itoa/src/lib.rs#L247-L254) in `im
 ### `crate attributes`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): A second `#![allow(...)]` for four clippy lints that only the Verus annotations trigger (erased proof blocks, `#[inline(always)]` stand-ins, the long annotated `u128::fmt`, and `ref_as_ptr`, which clippy applies once `rust-version` >= 1.76). Lint configuration only; no effect on the compiled code. Needed for upstream's clippy CI step (C4 in SPEC_REVIEW.md).  
+Agent's explanation (to be checked): A second `#![allow(...)]` for four clippy lints that only the annotations trigger: `inline_always` (the stand-ins and `buffer_of`), `ref_as_ptr` (upstream's `slice_buffer_to_str` body, once `rust-version` is 1.76 or later), `semicolon_if_nothing_returned` (erased `proof` blocks) and `too_many_lines` (`u128::fmt`). Lint configuration only; no effect on the compiled code.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `64b221e074df5daf`  
 Source: [src/lib.rs:40-52](../src/lib.rs#L40-L52)  
@@ -183,11 +183,11 @@ Annotated: [src/lib.rs:40-62](../verus_fixed/itoa/src/lib.rs#L40-L62)
 ### `fn divmod100`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `debug_assert!(value < 10_000)` removed (panic macros are unsupported). It is the precondition `requires value < 10_000`, proved at every call site, so the check could not fail.  
+Agent's explanation (to be checked): Only change: upstream's `debug_assert!(value < 10_000)` is removed (Verus 0.2026.05.03 did not support it; 0.2026.11.22 does) and is now the precondition `requires value < 10_000`, which Verus proves at every call; `divmod100` is private, so all callers are verified. Release builds are identical; debug builds lose a check that cannot fail.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `37842bef70e86340`  
 Source: [src/lib.rs:231-237](../src/lib.rs#L231-L237)  
-Annotated: [src/lib.rs:422-443](../verus_fixed/itoa/src/lib.rs#L422-L443)  
+Annotated: [src/lib.rs:424-445](../verus_fixed/itoa/src/lib.rs#L424-L445)  
 Hint: `debug_assert*!` removed (debug builds no longer check it)
 
 ```diff
@@ -207,11 +207,11 @@ Hint: `debug_assert*!` removed (debug builds no longer check it)
 ### `fn enc_16lsd`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Const generic `OFFSET` -> parameter `offset` (it would be `N - 16`, a generic constant expression stable Rust rejects); `for quad_index in (1..4).rev()` -> a `while` loop visiting 3, 2, 1; `*DECIMAL_PAIRS.0.get_unchecked(j)` -> the verified stand-in; `buf[i].write(v)` -> `buf[i] = MaybeUninit::new(v)` (what `write` does, minus the discarded reference). Same writes, same order.  
+Agent's explanation (to be checked): The const generic `OFFSET` becomes the run-time parameter `offset` (it would have to be `N - 16`, a generic constant expression, which stable Rust rejects). `u128::fmt` passes `N - 16` and `N - 32`, the same positions as upstream's `u128::MAX_STR_LEN - 16`/`- 32` on its 39-byte (sub)buffer. `for quad_index in (1..4).rev()` becomes a `while` loop visiting 3, 2, 1 in the same order (Verus 0.2026.05.03 did not support `Rev`; 0.2026.11.22 does). `get_unchecked` becomes the verified stand-in, and `buf[i].write(v)` becomes `buf[i] = MaybeUninit::new(v)` (what `write` does; itoa discards its return value); the indexing stays bounds-checked as upstream. Same bytes written to the same positions.  
 Configurations: --no-default-features  
 Fingerprint: `7d3693ee881cdffb`  
 Source: [src/lib.rs:414-444](../src/lib.rs#L414-L444)  
-Annotated: [src/lib.rs:912-999](../verus_fixed/itoa/src/lib.rs#L912-L999)  
+Annotated: [src/lib.rs:914-1001](../verus_fixed/itoa/src/lib.rs#L914-L1001)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: `for .. in (..).rev()` -> `while` loop
 
@@ -289,11 +289,11 @@ Hint: `for .. in (..).rev()` -> `while` loop
 ### `fn enc_16lsd`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Const generic `OFFSET` -> parameter `offset` (it would be `N - 16`, a generic constant expression stable Rust rejects); `for quad_index in (1..4).rev()` -> a `while` loop visiting 3, 2, 1; `*DECIMAL_PAIRS.0.get_unchecked(j)` -> the verified stand-in; `buf[i].write(v)` -> `buf[i] = MaybeUninit::new(v)` (what `write` does, minus the discarded reference). Same writes, same order.  
+Agent's explanation (to be checked): The const generic `OFFSET` becomes the run-time parameter `offset` (it would have to be `N - 16`, a generic constant expression, which stable Rust rejects). `u128::fmt` passes `N - 16` and `N - 32`, the same positions as upstream's `u128::MAX_STR_LEN - 16`/`- 32` on its 39-byte (sub)buffer. `for quad_index in (1..4).rev()` becomes a `while` loop visiting 3, 2, 1 in the same order (Verus 0.2026.05.03 did not support `Rev`; 0.2026.11.22 does). `get_unchecked` becomes the verified stand-in, and `buf[i].write(v)` becomes `buf[i] = MaybeUninit::new(v)` (what `write` does; itoa discards its return value); the indexing stays bounds-checked as upstream. Same bytes written to the same positions. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry. The wrapper also rebinds the new parameter (`let offset = offset;`).  
 Configurations: --all-features  
 Fingerprint: `31827da48143be04`  
 Source: [src/lib.rs:414-444](../src/lib.rs#L414-L444)  
-Annotated: [src/lib.rs:912-999](../verus_fixed/itoa/src/lib.rs#L912-L999)  
+Annotated: [src/lib.rs:914-1001](../verus_fixed/itoa/src/lib.rs#L914-L1001)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: `for .. in (..).rev()` -> `while` loop
 
@@ -381,7 +381,7 @@ Hint: `for .. in (..).rev()` -> `while` loop
 ### `fn slice_buffer_to_str`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Visibility `pub(crate)`, because it moved into module `trusted`; the body is upstream's, verbatim (check_trusted.py).  
+Agent's explanation (to be checked): Body token-identical to upstream. The function moved to `trusted.rs` (it is trusted, see the `external_body` entry), so its visibility widens from private to `pub(crate)` for the calls from `lib.rs`; still not public API.  
 Configurations: --no-default-features  
 Fingerprint: `85c7d6ab0d87ef16`  
 Source: [src/lib.rs:247-253](../src/lib.rs#L247-L253)  
@@ -403,7 +403,7 @@ Hint: visibility widened to `pub(crate)`
 ### `fn slice_buffer_to_str`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Visibility `pub(crate)`, because it moved into module `trusted`; the body is upstream's, verbatim (check_trusted.py).  
+Agent's explanation (to be checked): Body token-identical to upstream. The function moved to `trusted.rs` (it is trusted, see the `external_body` entry), so its visibility widens from private to `pub(crate)` for the calls from `lib.rs`; still not public API. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `dd8f5678fde411d2`  
 Source: [src/lib.rs:247-253](../src/lib.rs#L247-L253)  
@@ -426,11 +426,11 @@ Hint: visibility widened to `pub(crate)`
 ### `impl Buffer :: fn format`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): The raw-pointer cast moved into the trusted `buffer_of` (`#[inline(always)]`), so the rest of `format`, including the `unreachable_unchecked` length check, is verified. Release assembly of `format` is identical to the first pass for all 12 types.  
+Agent's explanation (to be checked): The raw-pointer cast (`let buf_ptr = ...cast::<I::Buffer>();` and `&mut *buf_ptr`) moves into the trusted, `#[inline(always)]` `buffer_of`, so the rest of `format` is verified, including that the `string.len() > I::MAX_STR_LEN` branch to `unreachable_unchecked` is dead. Same statements in the same order; the length check and its `unreachable_unchecked` are unchanged.  
 Configurations: --no-default-features  
 Fingerprint: `ce67519b46d0072e`  
 Source: [src/lib.rs:106-113](../src/lib.rs#L106-L113)  
-Annotated: [src/lib.rs:160-181](../verus_fixed/itoa/src/lib.rs#L160-L181)  
+Annotated: [src/lib.rs:161-182](../verus_fixed/itoa/src/lib.rs#L161-L182)  
 Hint: raw-pointer cast -> trusted `buffer_of`
 
 ```diff
@@ -448,11 +448,11 @@ Hint: raw-pointer cast -> trusted `buffer_of`
 ### `impl Buffer :: fn format`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): The raw-pointer cast moved into the trusted `buffer_of` (`#[inline(always)]`), so the rest of `format`, including the `unreachable_unchecked` length check, is verified. Release assembly of `format` is identical to the first pass for all 12 types.  
+Agent's explanation (to be checked): The raw-pointer cast (`let buf_ptr = ...cast::<I::Buffer>();` and `&mut *buf_ptr`) moves into the trusted, `#[inline(always)]` `buffer_of`, so the rest of `format` is verified, including that the `string.len() > I::MAX_STR_LEN` branch to `unreachable_unchecked` is dead. Same statements in the same order; the length check and its `unreachable_unchecked` are unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `7f3b02940aacd54a`  
 Source: [src/lib.rs:106-113](../src/lib.rs#L106-L113)  
-Annotated: [src/lib.rs:160-181](../verus_fixed/itoa/src/lib.rs#L160-L181)  
+Annotated: [src/lib.rs:161-182](../verus_fixed/itoa/src/lib.rs#L161-L182)  
 Hint: raw-pointer cast -> trusted `buffer_of`
 
 ```diff
@@ -471,11 +471,11 @@ Hint: raw-pointer cast -> trusted `buffer_of`
 ### `impl Buffer :: fn new`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN` (both 40).  
+Agent's explanation (to be checked): Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN`, both 40: the same array. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features  
 Fingerprint: `1b31b2efb4b4f33a`  
 Source: [src/lib.rs:98-101](../src/lib.rs#L98-L101)  
-Annotated: [src/lib.rs:148-155](../verus_fixed/itoa/src/lib.rs#L148-L155)  
+Annotated: [src/lib.rs:149-156](../verus_fixed/itoa/src/lib.rs#L149-L156)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -493,11 +493,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Buffer :: fn new`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN` (both 40).  
+Agent's explanation (to be checked): Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN`, both 40: the same array. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `81608c02364c07fb`  
 Source: [src/lib.rs:98-101](../src/lib.rs#L98-L101)  
-Annotated: [src/lib.rs:148-155](../verus_fixed/itoa/src/lib.rs#L148-L155)  
+Annotated: [src/lib.rs:149-156](../verus_fixed/itoa/src/lib.rs#L149-L156)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -515,11 +515,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for i128 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `i128::MAX.ilog10() as usize + 2` -> `private::I128_MAX_STR_LEN` (40, the length of `-170141183460469231731687303715884105728`). The same value: `const _ #5` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `e4b579e442f8ed27`  
 Source: [src/lib.rs:160](../src/lib.rs#L160) in `impl_Integer!`, invoked at [src/lib.rs:189](../src/lib.rs#L189)  
-Annotated: [src/lib.rs:297](../verus_fixed/itoa/src/lib.rs#L297) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
+Annotated: [src/lib.rs:299](../verus_fixed/itoa/src/lib.rs#L299) in `impl_Integer!`, invoked at [src/lib.rs:346](../verus_fixed/itoa/src/lib.rs#L346)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -533,11 +533,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for i16 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `i16::MAX.ilog10() as usize + 2` -> `private::I16_MAX_STR_LEN` (6, the length of `-32768`). The same value: `const _ #2` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `1f7efda856276926`  
 Source: [src/lib.rs:160](../src/lib.rs#L160) in `impl_Integer!`, invoked at [src/lib.rs:186](../src/lib.rs#L186)  
-Annotated: [src/lib.rs:297](../verus_fixed/itoa/src/lib.rs#L297) in `impl_Integer!`, invoked at [src/lib.rs:341](../verus_fixed/itoa/src/lib.rs#L341)  
+Annotated: [src/lib.rs:299](../verus_fixed/itoa/src/lib.rs#L299) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -551,11 +551,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for i32 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `i32::MAX.ilog10() as usize + 2` -> `private::I32_MAX_STR_LEN` (11, the length of `-2147483648`). The same value: `const _ #3` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `2d429dff82b2c9e6`  
 Source: [src/lib.rs:160](../src/lib.rs#L160) in `impl_Integer!`, invoked at [src/lib.rs:187](../src/lib.rs#L187)  
-Annotated: [src/lib.rs:297](../verus_fixed/itoa/src/lib.rs#L297) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
+Annotated: [src/lib.rs:299](../verus_fixed/itoa/src/lib.rs#L299) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -569,11 +569,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for i64 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `i64::MAX.ilog10() as usize + 2` -> `private::I64_MAX_STR_LEN` (20, the length of `-9223372036854775808`). The same value: `const _ #4` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `763a897f96910079`  
 Source: [src/lib.rs:160](../src/lib.rs#L160) in `impl_Integer!`, invoked at [src/lib.rs:188](../src/lib.rs#L188)  
-Annotated: [src/lib.rs:297](../verus_fixed/itoa/src/lib.rs#L297) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
+Annotated: [src/lib.rs:299](../verus_fixed/itoa/src/lib.rs#L299) in `impl_Integer!`, invoked at [src/lib.rs:345](../verus_fixed/itoa/src/lib.rs#L345)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -587,11 +587,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for i8 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `i8::MAX.ilog10() as usize + 2` -> `private::I8_MAX_STR_LEN` (4, the length of `-128`). The same value: `const _ #1` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `414f44f5ccc106ff`  
 Source: [src/lib.rs:160](../src/lib.rs#L160) in `impl_Integer!`, invoked at [src/lib.rs:185](../src/lib.rs#L185)  
-Annotated: [src/lib.rs:297](../verus_fixed/itoa/src/lib.rs#L297) in `impl_Integer!`, invoked at [src/lib.rs:340](../verus_fixed/itoa/src/lib.rs#L340)  
+Annotated: [src/lib.rs:299](../verus_fixed/itoa/src/lib.rs#L299) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -605,11 +605,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for isize :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `<u64|i64 as Integer>::MAX_STR_LEN` -> the same plain constant (20). A Verus assertion in `lemma_max_str_len` proves the two equal; defining it by projection silently broke Verus's proofs for u64/i64 (VERIFICATION.md, Verus findings).  
+Agent's explanation (to be checked): `<i64 as Integer>::MAX_STR_LEN` -> `private::I64_MAX_STR_LEN` (20), the same value. This is the 64-bit invocation (`impl_Integer_size!(isize as i64, ...)`); the 16- and 32-bit invocations (lib.rs:390-393) pass `I16_MAX_STR_LEN` and `I32_MAX_STR_LEN`, matching upstream's primitives, but are not compiled on this host. Checked by a Verus assertion (`Self::MAX_STR_LEN == <i64 as Integer>::MAX_STR_LEN`, 64-bit only); there is no compile-time assert. Upstream's projection was avoided because a constant defined by projection stops Verus from unfolding the spec functions of the `i64` impls (still the case in Verus 0.2026.11.22).  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `e71f6b9d0182b63f`  
 Source: [src/lib.rs:195](../src/lib.rs#L195) in `impl_Integer_size!`, invoked at [src/lib.rs:215](../src/lib.rs#L215)  
-Annotated: [src/lib.rs:355](../verus_fixed/itoa/src/lib.rs#L355) in `impl_Integer_size!`, invoked at [src/lib.rs:392](../verus_fixed/itoa/src/lib.rs#L392)  
+Annotated: [src/lib.rs:357](../verus_fixed/itoa/src/lib.rs#L357) in `impl_Integer_size!`, invoked at [src/lib.rs:394](../verus_fixed/itoa/src/lib.rs#L394)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -623,11 +623,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for u128 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `u128::MAX.ilog10() as usize + 1` -> `private::U128_MAX_STR_LEN` (39, the length of `340282366920938463463374607431768211455`). The same value: `const _ #5` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `46ca6a2599f1a954`  
 Source: [src/lib.rs:144](../src/lib.rs#L144) in `impl_Integer!`, invoked at [src/lib.rs:189](../src/lib.rs#L189)  
-Annotated: [src/lib.rs:259](../verus_fixed/itoa/src/lib.rs#L259) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
+Annotated: [src/lib.rs:261](../verus_fixed/itoa/src/lib.rs#L261) in `impl_Integer!`, invoked at [src/lib.rs:346](../verus_fixed/itoa/src/lib.rs#L346)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -641,11 +641,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for u16 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `u16::MAX.ilog10() as usize + 1` -> `private::U16_MAX_STR_LEN` (5, the length of `65535`). The same value: `const _ #2` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `941232739e173c0f`  
 Source: [src/lib.rs:144](../src/lib.rs#L144) in `impl_Integer!`, invoked at [src/lib.rs:186](../src/lib.rs#L186)  
-Annotated: [src/lib.rs:259](../verus_fixed/itoa/src/lib.rs#L259) in `impl_Integer!`, invoked at [src/lib.rs:341](../verus_fixed/itoa/src/lib.rs#L341)  
+Annotated: [src/lib.rs:261](../verus_fixed/itoa/src/lib.rs#L261) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -659,11 +659,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for u32 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `u32::MAX.ilog10() as usize + 1` -> `private::U32_MAX_STR_LEN` (10, the length of `4294967295`). The same value: `const _ #3` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `1547faae6e8a48d3`  
 Source: [src/lib.rs:144](../src/lib.rs#L144) in `impl_Integer!`, invoked at [src/lib.rs:187](../src/lib.rs#L187)  
-Annotated: [src/lib.rs:259](../verus_fixed/itoa/src/lib.rs#L259) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
+Annotated: [src/lib.rs:261](../verus_fixed/itoa/src/lib.rs#L261) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -677,11 +677,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for u64 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `u64::MAX.ilog10() as usize + 1` -> `private::U64_MAX_STR_LEN` (20, the length of `18446744073709551615`). The same value: `const _ #4` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `1d022d464bccd379`  
 Source: [src/lib.rs:144](../src/lib.rs#L144) in `impl_Integer!`, invoked at [src/lib.rs:188](../src/lib.rs#L188)  
-Annotated: [src/lib.rs:259](../verus_fixed/itoa/src/lib.rs#L259) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
+Annotated: [src/lib.rs:261](../verus_fixed/itoa/src/lib.rs#L261) in `impl_Integer!`, invoked at [src/lib.rs:345](../verus_fixed/itoa/src/lib.rs#L345)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -695,11 +695,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for u8 :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `MAX.ilog10() as usize + 1` (`+ 2` for signed) -> the plain constant of `private` with the same value; equality checked at compile time by the `const _` assert.  
+Agent's explanation (to be checked): `u8::MAX.ilog10() as usize + 1` -> `private::U8_MAX_STR_LEN` (3, the length of `255`). The same value: `const _ #1` asserts the equality at compile time. Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `9f2272406516f654`  
 Source: [src/lib.rs:144](../src/lib.rs#L144) in `impl_Integer!`, invoked at [src/lib.rs:185](../src/lib.rs#L185)  
-Annotated: [src/lib.rs:259](../verus_fixed/itoa/src/lib.rs#L259) in `impl_Integer!`, invoked at [src/lib.rs:340](../verus_fixed/itoa/src/lib.rs#L340)  
+Annotated: [src/lib.rs:261](../verus_fixed/itoa/src/lib.rs#L261) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -713,11 +713,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Integer for usize :: const MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `<u64|i64 as Integer>::MAX_STR_LEN` -> the same plain constant (20). A Verus assertion in `lemma_max_str_len` proves the two equal; defining it by projection silently broke Verus's proofs for u64/i64 (VERIFICATION.md, Verus findings).  
+Agent's explanation (to be checked): `<u64 as Integer>::MAX_STR_LEN` -> `private::U64_MAX_STR_LEN` (20), the same value. This is the 64-bit invocation (`impl_Integer_size!(usize as u64, ...)`); the 16- and 32-bit invocations (lib.rs:390-393) pass `U16_MAX_STR_LEN` and `U32_MAX_STR_LEN`, matching upstream's primitives, but are not compiled on this host. Checked by a Verus assertion (`Self::MAX_STR_LEN == <u64 as Integer>::MAX_STR_LEN`, 64-bit only); there is no compile-time assert. Upstream's projection was avoided because a constant defined by projection stops Verus from unfolding the spec functions of the `u64` impls (still the case in Verus 0.2026.11.22).  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `a47c5b005d5d94df`  
 Source: [src/lib.rs:195](../src/lib.rs#L195) in `impl_Integer_size!`, invoked at [src/lib.rs:216](../src/lib.rs#L216)  
-Annotated: [src/lib.rs:355](../verus_fixed/itoa/src/lib.rs#L355) in `impl_Integer_size!`, invoked at [src/lib.rs:393](../verus_fixed/itoa/src/lib.rs#L393)  
+Annotated: [src/lib.rs:357](../verus_fixed/itoa/src/lib.rs#L357) in `impl_Integer_size!`, invoked at [src/lib.rs:395](../verus_fixed/itoa/src/lib.rs#L395)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -731,11 +731,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl Unsigned for u128 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): As for u8..u64 `fmt`, plus: `u128::MAX_STR_LEN` -> `N` (the buffer length; 39 for u128, 40 when called from i128), `enc_16lsd::<{..}>(buf, x)` -> `enc_16lsd(buf, N - 16, x)`, and the zero case `buf[offset].write(b'0')` -> `buf[offset] = MaybeUninit::new(48)`.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). `u128::MAX_STR_LEN` becomes `N` (5 places): for `u128`'s own buffer N = 39, upstream's value; on `i128`'s buffer (N = 40) every position shifts by one, exactly as upstream's tail subslice starting at 1 does. The `enc_16lsd` calls pass the offset as an argument (`N - 16`, `N - 32`). The zero case writes `MaybeUninit::new(48)` at `buf.len() - 1` (checked index, as upstream). `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow).  
 Configurations: --no-default-features  
 Fingerprint: `44075f6c1034fcec`  
 Source: [src/lib.rs:336-409](../src/lib.rs#L336-L409)  
-Annotated: [src/lib.rs:624-774](../verus_fixed/itoa/src/lib.rs#L624-L774)  
+Annotated: [src/lib.rs:626-776](../verus_fixed/itoa/src/lib.rs#L626-L776)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: `MaybeUninit::write` -> assignment of `MaybeUninit::new(..)`  
 Hint: byte literal or byte string -> numbers  
@@ -828,11 +828,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl Unsigned for u128 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): As for u8..u64 `fmt`, plus: `u128::MAX_STR_LEN` -> `N` (the buffer length; 39 for u128, 40 when called from i128), `enc_16lsd::<{..}>(buf, x)` -> `enc_16lsd(buf, N - 16, x)`, and the zero case `buf[offset].write(b'0')` -> `buf[offset] = MaybeUninit::new(48)`.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). `u128::MAX_STR_LEN` becomes `N` (5 places): for `u128`'s own buffer N = 39, upstream's value; on `i128`'s buffer (N = 40) every position shifts by one, exactly as upstream's tail subslice starting at 1 does. The `enc_16lsd` calls pass the offset as an argument (`N - 16`, `N - 32`). The zero case writes `MaybeUninit::new(48)` at `buf.len() - 1` (checked index, as upstream). `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `f18b56a7df2fb0f6`  
 Source: [src/lib.rs:336-409](../src/lib.rs#L336-L409)  
-Annotated: [src/lib.rs:624-774](../verus_fixed/itoa/src/lib.rs#L624-L774)  
+Annotated: [src/lib.rs:626-776](../verus_fixed/itoa/src/lib.rs#L626-L776)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: `MaybeUninit::write` -> assignment of `MaybeUninit::new(..)`  
 Hint: byte literal or byte string -> numbers  
@@ -930,11 +930,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl Unsigned for u16 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u16`'s own buffer (N = 5, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i16`'s buffer (N = 6) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow).  
 Configurations: --no-default-features  
 Fingerprint: `485792657bb9e07a`  
 Source: [src/lib.rs:263-324](../src/lib.rs#L263-L324) in `impl_Unsigned!`, invoked at [src/lib.rs:330](../src/lib.rs#L330)  
-Annotated: [src/lib.rs:496-603](../verus_fixed/itoa/src/lib.rs#L496-L603) in `impl_Unsigned!`, invoked at [src/lib.rs:610](../verus_fixed/itoa/src/lib.rs#L610)  
+Annotated: [src/lib.rs:498-605](../verus_fixed/itoa/src/lib.rs#L498-L605) in `impl_Unsigned!`, invoked at [src/lib.rs:612](../verus_fixed/itoa/src/lib.rs#L612)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: byte literal or byte string -> numbers  
 Hint: `fmt` generic over the buffer length `N`  
@@ -1003,11 +1003,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl Unsigned for u16 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u16`'s own buffer (N = 5, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i16`'s buffer (N = 6) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `69ca568537e41136`  
 Source: [src/lib.rs:263-324](../src/lib.rs#L263-L324) in `impl_Unsigned!`, invoked at [src/lib.rs:330](../src/lib.rs#L330)  
-Annotated: [src/lib.rs:496-603](../verus_fixed/itoa/src/lib.rs#L496-L603) in `impl_Unsigned!`, invoked at [src/lib.rs:610](../verus_fixed/itoa/src/lib.rs#L610)  
+Annotated: [src/lib.rs:498-605](../verus_fixed/itoa/src/lib.rs#L498-L605) in `impl_Unsigned!`, invoked at [src/lib.rs:612](../verus_fixed/itoa/src/lib.rs#L612)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: byte literal or byte string -> numbers  
 Hint: `fmt` generic over the buffer length `N`  
@@ -1078,11 +1078,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl Unsigned for u32 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u32`'s own buffer (N = 10, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i32`'s buffer (N = 11) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow).  
 Configurations: --no-default-features  
 Fingerprint: `485792657bb9e07a`  
 Source: [src/lib.rs:263-324](../src/lib.rs#L263-L324) in `impl_Unsigned!`, invoked at [src/lib.rs:331](../src/lib.rs#L331)  
-Annotated: [src/lib.rs:496-603](../verus_fixed/itoa/src/lib.rs#L496-L603) in `impl_Unsigned!`, invoked at [src/lib.rs:611](../verus_fixed/itoa/src/lib.rs#L611)  
+Annotated: [src/lib.rs:498-605](../verus_fixed/itoa/src/lib.rs#L498-L605) in `impl_Unsigned!`, invoked at [src/lib.rs:613](../verus_fixed/itoa/src/lib.rs#L613)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: byte literal or byte string -> numbers  
 Hint: `fmt` generic over the buffer length `N`  
@@ -1151,11 +1151,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl Unsigned for u32 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u32`'s own buffer (N = 10, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i32`'s buffer (N = 11) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `69ca568537e41136`  
 Source: [src/lib.rs:263-324](../src/lib.rs#L263-L324) in `impl_Unsigned!`, invoked at [src/lib.rs:331](../src/lib.rs#L331)  
-Annotated: [src/lib.rs:496-603](../verus_fixed/itoa/src/lib.rs#L496-L603) in `impl_Unsigned!`, invoked at [src/lib.rs:611](../verus_fixed/itoa/src/lib.rs#L611)  
+Annotated: [src/lib.rs:498-605](../verus_fixed/itoa/src/lib.rs#L498-L605) in `impl_Unsigned!`, invoked at [src/lib.rs:613](../verus_fixed/itoa/src/lib.rs#L613)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: byte literal or byte string -> numbers  
 Hint: `fmt` generic over the buffer length `N`  
@@ -1226,11 +1226,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl Unsigned for u64 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u64`'s own buffer (N = 20, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i64`'s buffer (N = 20) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow).  
 Configurations: --no-default-features  
 Fingerprint: `485792657bb9e07a`  
 Source: [src/lib.rs:263-324](../src/lib.rs#L263-L324) in `impl_Unsigned!`, invoked at [src/lib.rs:332](../src/lib.rs#L332)  
-Annotated: [src/lib.rs:496-603](../verus_fixed/itoa/src/lib.rs#L496-L603) in `impl_Unsigned!`, invoked at [src/lib.rs:612](../verus_fixed/itoa/src/lib.rs#L612)  
+Annotated: [src/lib.rs:498-605](../verus_fixed/itoa/src/lib.rs#L498-L605) in `impl_Unsigned!`, invoked at [src/lib.rs:614](../verus_fixed/itoa/src/lib.rs#L614)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: byte literal or byte string -> numbers  
 Hint: `fmt` generic over the buffer length `N`  
@@ -1299,11 +1299,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl Unsigned for u64 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u64`'s own buffer (N = 20, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i64`'s buffer (N = 20) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `69ca568537e41136`  
 Source: [src/lib.rs:263-324](../src/lib.rs#L263-L324) in `impl_Unsigned!`, invoked at [src/lib.rs:332](../src/lib.rs#L332)  
-Annotated: [src/lib.rs:496-603](../verus_fixed/itoa/src/lib.rs#L496-L603) in `impl_Unsigned!`, invoked at [src/lib.rs:612](../verus_fixed/itoa/src/lib.rs#L612)  
+Annotated: [src/lib.rs:498-605](../verus_fixed/itoa/src/lib.rs#L498-L605) in `impl_Unsigned!`, invoked at [src/lib.rs:614](../verus_fixed/itoa/src/lib.rs#L614)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: byte literal or byte string -> numbers  
 Hint: `fmt` generic over the buffer length `N`  
@@ -1374,11 +1374,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl Unsigned for u8 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u8`'s own buffer (N = 3, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i8`'s buffer (N = 4) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow).  
 Configurations: --no-default-features  
 Fingerprint: `485792657bb9e07a`  
 Source: [src/lib.rs:263-324](../src/lib.rs#L263-L324) in `impl_Unsigned!`, invoked at [src/lib.rs:329](../src/lib.rs#L329)  
-Annotated: [src/lib.rs:496-603](../verus_fixed/itoa/src/lib.rs#L496-L603) in `impl_Unsigned!`, invoked at [src/lib.rs:609](../verus_fixed/itoa/src/lib.rs#L609)  
+Annotated: [src/lib.rs:498-605](../verus_fixed/itoa/src/lib.rs#L498-L605) in `impl_Unsigned!`, invoked at [src/lib.rs:611](../verus_fixed/itoa/src/lib.rs#L611)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: byte literal or byte string -> numbers  
 Hint: `fmt` generic over the buffer length `N`  
@@ -1447,11 +1447,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl Unsigned for u8 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Signature generic over the array length `N` (lets `Signed::fmt` use the longer signed buffer; Verus has no `&mut buf[a..]` or slice-to-array `try_into`). `buf.get_unchecked_mut(i).write(v)` -> `write_unchecked(buf, i, v)`, `*DECIMAL_PAIRS.0.get_unchecked(j)` -> `*get_unchecked(&DECIMAL_PAIRS.0, j)` (verified stand-ins), `b'0'` -> `48`. Same bytes at the same positions, same returned offset.  
+Agent's explanation (to be checked): Signature `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, so that `Signed::fmt` can pass the signed type's longer buffer (upstream converts a subslice with `try_into`, which Verus does not support). The body still starts from `buf.len()` and writes right-aligned, so for `u8`'s own buffer (N = 3, upstream's `Self::MAX_STR_LEN`) it is unchanged, and on `i8`'s buffer (N = 4) it writes where upstream's tail subslice did. The `expect` calls and the rest of the loop are unchanged. `buf.get_unchecked_mut(i).write(v)` and `DECIMAL_PAIRS.0.get_unchecked(j)` become the verified stand-ins `write_unchecked`/`get_unchecked` (same element for in-bounds indices; Verus proves every index in bounds), and `b'0' + last` becomes `48 + last` (`last <= 15`, no overflow). Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `69ca568537e41136`  
 Source: [src/lib.rs:263-324](../src/lib.rs#L263-L324) in `impl_Unsigned!`, invoked at [src/lib.rs:329](../src/lib.rs#L329)  
-Annotated: [src/lib.rs:496-603](../verus_fixed/itoa/src/lib.rs#L496-L603) in `impl_Unsigned!`, invoked at [src/lib.rs:609](../verus_fixed/itoa/src/lib.rs#L609)  
+Annotated: [src/lib.rs:498-605](../verus_fixed/itoa/src/lib.rs#L498-L605) in `impl_Unsigned!`, invoked at [src/lib.rs:611](../verus_fixed/itoa/src/lib.rs#L611)  
 Hint: `get_unchecked(_mut)` -> verified stand-in from std_ext.rs  
 Hint: byte literal or byte string -> numbers  
 Hint: `fmt` generic over the buffer length `N`  
@@ -1522,11 +1522,11 @@ Hint: calls functions that verification added: `write_unchecked`
 ### `impl private :: Sealed for i128 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i128`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 40, U = 39) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged.  
 Configurations: --no-default-features  
 Fingerprint: `716019a5c32c89e7`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:189](../src/lib.rs#L189)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:346](../verus_fixed/itoa/src/lib.rs#L346)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1552,11 +1552,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i128 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i128`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 40, U = 39) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `9f12aa2c2b9f2fc2`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:189](../src/lib.rs#L189)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:346](../verus_fixed/itoa/src/lib.rs#L346)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1582,11 +1582,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i128 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN` (40), the value of `i128::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 40]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `26b8e12178b78cc5`  
 Source: [src/lib.rs:164](../src/lib.rs#L164) in `impl_Integer!`, invoked at [src/lib.rs:189](../src/lib.rs#L189)  
-Annotated: [src/lib.rs:306](../verus_fixed/itoa/src/lib.rs#L306) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
+Annotated: [src/lib.rs:308](../verus_fixed/itoa/src/lib.rs#L308) in `impl_Integer!`, invoked at [src/lib.rs:346](../verus_fixed/itoa/src/lib.rs#L346)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -1600,11 +1600,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl private :: Sealed for i16 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i16`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 6, U = 5) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged.  
 Configurations: --no-default-features  
 Fingerprint: `f6541f7abe398f19`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:186](../src/lib.rs#L186)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:341](../verus_fixed/itoa/src/lib.rs#L341)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1630,11 +1630,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i16 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i16`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 6, U = 5) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `c95ad023b5480e27`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:186](../src/lib.rs#L186)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:341](../verus_fixed/itoa/src/lib.rs#L341)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1660,11 +1660,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i16 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::I16_MAX_STR_LEN` (6), the value of `i16::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 6]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `1a8a20ca07cac2d4`  
 Source: [src/lib.rs:164](../src/lib.rs#L164) in `impl_Integer!`, invoked at [src/lib.rs:186](../src/lib.rs#L186)  
-Annotated: [src/lib.rs:306](../verus_fixed/itoa/src/lib.rs#L306) in `impl_Integer!`, invoked at [src/lib.rs:341](../verus_fixed/itoa/src/lib.rs#L341)  
+Annotated: [src/lib.rs:308](../verus_fixed/itoa/src/lib.rs#L308) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -1678,11 +1678,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl private :: Sealed for i32 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i32`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 11, U = 10) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged.  
 Configurations: --no-default-features  
 Fingerprint: `9d33fa12b0ad6840`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:187](../src/lib.rs#L187)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1708,11 +1708,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i32 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i32`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 11, U = 10) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `482ffd81eda94a17`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:187](../src/lib.rs#L187)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1738,11 +1738,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i32 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::I32_MAX_STR_LEN` (11), the value of `i32::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 11]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `ff8c86e6c45f789e`  
 Source: [src/lib.rs:164](../src/lib.rs#L164) in `impl_Integer!`, invoked at [src/lib.rs:187](../src/lib.rs#L187)  
-Annotated: [src/lib.rs:306](../verus_fixed/itoa/src/lib.rs#L306) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
+Annotated: [src/lib.rs:308](../verus_fixed/itoa/src/lib.rs#L308) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -1756,11 +1756,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl private :: Sealed for i64 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i64`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 20, U = 20) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Here S = U = 20, so upstream's tail is the whole buffer, and the `'-'` fits only because |i64::MIN| = 2^63 has 19 digits; Verus proves this.  
 Configurations: --no-default-features  
 Fingerprint: `f5e16a4fd004da34`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:188](../src/lib.rs#L188)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:345](../verus_fixed/itoa/src/lib.rs#L345)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1786,11 +1786,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i64 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i64`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 20, U = 20) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Here S = U = 20, so upstream's tail is the whole buffer, and the `'-'` fits only because |i64::MIN| = 2^63 has 19 digits; Verus proves this. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `31a4c29fdbc85767`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:188](../src/lib.rs#L188)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:345](../verus_fixed/itoa/src/lib.rs#L345)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1816,11 +1816,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i64 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::I64_MAX_STR_LEN` (20), the value of `i64::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 20]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `d1abe49ec7c47d25`  
 Source: [src/lib.rs:164](../src/lib.rs#L164) in `impl_Integer!`, invoked at [src/lib.rs:188](../src/lib.rs#L188)  
-Annotated: [src/lib.rs:306](../verus_fixed/itoa/src/lib.rs#L306) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
+Annotated: [src/lib.rs:308](../verus_fixed/itoa/src/lib.rs#L308) in `impl_Integer!`, invoked at [src/lib.rs:345](../verus_fixed/itoa/src/lib.rs#L345)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -1834,11 +1834,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl private :: Sealed for i8 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i8`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 4, U = 3) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged.  
 Configurations: --no-default-features  
 Fingerprint: `800733311b030d24`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:185](../src/lib.rs#L185)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:340](../verus_fixed/itoa/src/lib.rs#L340)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1864,11 +1864,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i8 :: fn write`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting moved into the verified `Signed::fmt`, which formats `|self|` right-aligned in the whole buffer (where upstream used the subslice `buf[MAX_S - MAX_U..]`, which ends at the same place) and writes `'-'` before it. Same bytes, same returned offset.  
+Agent's explanation (to be checked): The formatting moves into the verified `Signed::fmt` (`impl Signed for i8`). Upstream formats `self.unsigned_abs()` into the tail `buf[S - U..]` (S = 4, U = 3) converted with `try_into().unwrap()`, which writes the digits at absolute positions [S - len, S) and returns S - len, then writes `'-'` before them if negative. `Signed::fmt` formats into the whole buffer, right-aligned from its end: the same digits at the same positions, the same `'-'` and the same offset. The removed `try_into().unwrap()` could never fail. The call to `slice_buffer_to_str` is unchanged. Under `--all-features` the `no_panic` wrapper surrounds the same body on both sides; the changed lines are the same as in the `--no-default-features` entry.  
 Configurations: --all-features  
 Fingerprint: `c0fc8e25fa57b990`  
 Source: [src/lib.rs:168-180](../src/lib.rs#L168-L180) in `impl_Integer!`, invoked at [src/lib.rs:185](../src/lib.rs#L185)  
-Annotated: [src/lib.rs:314-333](../verus_fixed/itoa/src/lib.rs#L314-L333) in `impl_Integer!`, invoked at [src/lib.rs:340](../verus_fixed/itoa/src/lib.rs#L340)  
+Annotated: [src/lib.rs:316-335](../verus_fixed/itoa/src/lib.rs#L316-L335) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
 Hint: byte literal or byte string -> numbers  
 Hint: signed formatting -> verified `Signed::fmt`
 
@@ -1894,11 +1894,11 @@ Hint: signed formatting -> verified `Signed::fmt`
 ### `impl private :: Sealed for i8 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::I8_MAX_STR_LEN` (4), the value of `i8::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 4]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `aa0f218b31c29451`  
 Source: [src/lib.rs:164](../src/lib.rs#L164) in `impl_Integer!`, invoked at [src/lib.rs:185](../src/lib.rs#L185)  
-Annotated: [src/lib.rs:306](../verus_fixed/itoa/src/lib.rs#L306) in `impl_Integer!`, invoked at [src/lib.rs:340](../verus_fixed/itoa/src/lib.rs#L340)  
+Annotated: [src/lib.rs:308](../verus_fixed/itoa/src/lib.rs#L308) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -1912,11 +1912,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl private :: Sealed for u128 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::U128_MAX_STR_LEN` (39), the value of `u128::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 39]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `36035e9850913be9`  
 Source: [src/lib.rs:148](../src/lib.rs#L148) in `impl_Integer!`, invoked at [src/lib.rs:189](../src/lib.rs#L189)  
-Annotated: [src/lib.rs:268](../verus_fixed/itoa/src/lib.rs#L268) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
+Annotated: [src/lib.rs:270](../verus_fixed/itoa/src/lib.rs#L270) in `impl_Integer!`, invoked at [src/lib.rs:346](../verus_fixed/itoa/src/lib.rs#L346)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -1930,11 +1930,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl private :: Sealed for u16 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::U16_MAX_STR_LEN` (5), the value of `u16::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 5]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `928dedecf6a21c5a`  
 Source: [src/lib.rs:148](../src/lib.rs#L148) in `impl_Integer!`, invoked at [src/lib.rs:186](../src/lib.rs#L186)  
-Annotated: [src/lib.rs:268](../verus_fixed/itoa/src/lib.rs#L268) in `impl_Integer!`, invoked at [src/lib.rs:341](../verus_fixed/itoa/src/lib.rs#L341)  
+Annotated: [src/lib.rs:270](../verus_fixed/itoa/src/lib.rs#L270) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -1948,11 +1948,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl private :: Sealed for u32 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::U32_MAX_STR_LEN` (10), the value of `u32::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 10]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `b7263b7cb4b32bbf`  
 Source: [src/lib.rs:148](../src/lib.rs#L148) in `impl_Integer!`, invoked at [src/lib.rs:187](../src/lib.rs#L187)  
-Annotated: [src/lib.rs:268](../verus_fixed/itoa/src/lib.rs#L268) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
+Annotated: [src/lib.rs:270](../verus_fixed/itoa/src/lib.rs#L270) in `impl_Integer!`, invoked at [src/lib.rs:344](../verus_fixed/itoa/src/lib.rs#L344)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -1966,11 +1966,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl private :: Sealed for u64 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::U64_MAX_STR_LEN` (20), the value of `u64::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 20]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `70139a7e5d6b7964`  
 Source: [src/lib.rs:148](../src/lib.rs#L148) in `impl_Integer!`, invoked at [src/lib.rs:188](../src/lib.rs#L188)  
-Annotated: [src/lib.rs:268](../verus_fixed/itoa/src/lib.rs#L268) in `impl_Integer!`, invoked at [src/lib.rs:343](../verus_fixed/itoa/src/lib.rs#L343)  
+Annotated: [src/lib.rs:270](../verus_fixed/itoa/src/lib.rs#L270) in `impl_Integer!`, invoked at [src/lib.rs:345](../verus_fixed/itoa/src/lib.rs#L345)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -1984,11 +1984,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `impl private :: Sealed for u8 :: type Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> the plain constant of `private` with the same value (same type after normalization). Needed because Verus crashes on an associated constant used as an array length.  
+Agent's explanation (to be checked): Array length `Self::MAX_STR_LEN` -> `private::U8_MAX_STR_LEN` (3), the value of `u8::MAX_STR_LEN`: the same type, `[MaybeUninit<u8>; 3]`. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `d124adcc8c498053`  
 Source: [src/lib.rs:148](../src/lib.rs#L148) in `impl_Integer!`, invoked at [src/lib.rs:185](../src/lib.rs#L185)  
-Annotated: [src/lib.rs:268](../verus_fixed/itoa/src/lib.rs#L268) in `impl_Integer!`, invoked at [src/lib.rs:340](../verus_fixed/itoa/src/lib.rs#L340)  
+Annotated: [src/lib.rs:270](../verus_fixed/itoa/src/lib.rs#L270) in `impl_Integer!`, invoked at [src/lib.rs:342](../verus_fixed/itoa/src/lib.rs#L342)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -2002,7 +2002,7 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `imports`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): vstd prelude (provides the `verus!` macro; no vstd function runs), the std_ext stand-ins, the two trusted functions, and per-module imports of the new modules (spec, human_spec, spec_equiv are ghost only and empty in a normal build). `core::str` moved with `slice_buffer_to_str` into trusted.rs.  
+Agent's explanation (to be checked): Follows the moved and added items: `use core::str` moved with `slice_buffer_to_str` to `trusted.rs`; imports of the stand-ins (`std_ext`) and of `buffer_of`/`slice_buffer_to_str` (`trusted`); `use vstd::prelude::*` in each module for the `verus!` macro, which erases ghost code and adds no run-time code; and the imports of the new ghost modules (spec, human_spec, spec_equiv), whose contents erase to nothing.  
 Configurations: --no-default-features  
 Fingerprint: `054348132b611b58`  
 Source: [src/lib.rs:56](../src/lib.rs#L56)  
@@ -2036,7 +2036,7 @@ Annotated: [src/lib.rs:80](../verus_fixed/itoa/src/lib.rs#L80)
 ### `imports`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): vstd prelude (provides the `verus!` macro; no vstd function runs), the std_ext stand-ins, the two trusted functions, and per-module imports of the new modules (spec, human_spec, spec_equiv are ghost only and empty in a normal build). `core::str` moved with `slice_buffer_to_str` into trusted.rs.  
+Agent's explanation (to be checked): Follows the moved and added items: `use core::str` moved with `slice_buffer_to_str` to `trusted.rs`; imports of the stand-ins (`std_ext`) and of `buffer_of`/`slice_buffer_to_str` (`trusted`); `use vstd::prelude::*` in each module for the `verus!` macro, which erases ghost code and adds no run-time code; and the imports of the new ghost modules (spec, human_spec, spec_equiv), whose contents erase to nothing. Under `--all-features`, `trusted.rs` also imports `no_panic`, for the `no_panic` attribute that `slice_buffer_to_str` keeps.  
 Configurations: --all-features  
 Fingerprint: `596f7a5d2bcd7966`  
 Source: [src/lib.rs:56](../src/lib.rs#L56)  
@@ -2071,11 +2071,11 @@ Annotated: [src/lib.rs:80](../verus_fixed/itoa/src/lib.rs#L80)
 ### `static DECIMAL_PAIRS`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Byte string `*b"0001...99"` -> the same 200 bytes as a numeric array (Verus has no byte literals; Verus proves the table equals `decimal_pairs()`); initializer wrapped in a block by `exec static`. Same value.  
+Agent's explanation (to be checked): The byte string `*b"0001...99"` becomes a numeric array literal (Verus 0.2026.05.03 did not support byte literals; 0.2026.11.22 does), with each row's string in a comment. Checked mechanically: the 200 numbers are byte-for-byte upstream's bytes. `exec static ... ensures ...` erases to a plain `static` whose initializer is the block `{ DecimalPairs([...]) }`, the same constant; `#[rustfmt::skip]` only affects formatting. `DecimalPairs` keeps `#[repr(C, align(2))]`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `63a01278b26c8d9d`  
 Source: [src/lib.rs:222-228](../src/lib.rs#L222-L228)  
-Annotated: [src/lib.rs:403-419](../verus_fixed/itoa/src/lib.rs#L403-L419)  
+Annotated: [src/lib.rs:405-421](../verus_fixed/itoa/src/lib.rs#L405-L421)  
 Hint: byte literal or byte string -> numbers
 
 ```diff
@@ -2110,11 +2110,11 @@ Hint: byte literal or byte string -> numbers
 ### `struct Buffer`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Array length `i128::MAX_STR_LEN` -> `private::I128_MAX_STR_LEN` (both 40): same type. Same reason as `type Buffer`.  
+Agent's explanation (to be checked): Field type `[MaybeUninit<u8>; i128::MAX_STR_LEN]` -> `[MaybeUninit<u8>; private::I128_MAX_STR_LEN]`, both 40: the same type and layout. The change was made because Verus 0.2026.05.03 crashed on an associated constant used as an array length. Verus 0.2026.11.22 no longer does: with upstream's array lengths restored the crate still verifies (165 verified), so this change could now be reverted.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `74e8cdf919ee15d3`  
 Source: [src/lib.rs:72-74](../src/lib.rs#L72-L74)  
-Annotated: [src/lib.rs:107-111](../verus_fixed/itoa/src/lib.rs#L107-L111)  
+Annotated: [src/lib.rs:107-112](../verus_fixed/itoa/src/lib.rs#L107-L112)  
 Hint: `MAX_STR_LEN` -> plain constant of `private`
 
 ```diff
@@ -2130,11 +2130,11 @@ Hint: `MAX_STR_LEN` -> plain constant of `private`
 ### `trait Unsigned`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `fn fmt(self, buf: &mut Self::Buffer)` -> generic over the array length `N` (see the impls), plus a doc comment.  
+Agent's explanation (to be checked): Crate-private trait. `fmt(self, buf: &mut Self::Buffer)` -> `fmt<const N: usize>(self, buf: &mut [MaybeUninit<u8>; N])`, plus a doc comment explaining why. The implementations write right-aligned from `buf.len()`, so the digits depend only on the end of the buffer.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `b1ae4f5e7e602c1c`  
 Source: [src/lib.rs:255-257](../src/lib.rs#L255-L257)  
-Annotated: [src/lib.rs:465-485](../verus_fixed/itoa/src/lib.rs#L465-L485)  
+Annotated: [src/lib.rs:467-487](../verus_fixed/itoa/src/lib.rs#L467-L487)  
 Hint: `fmt` generic over the buffer length `N`
 
 ```diff
@@ -2160,9 +2160,9 @@ Hint: `fmt` generic over the buffer length `N`
 ### `file Cargo.toml`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): `vstd` dependency (default-features off; provides the `verus!` macro, no run-time calls), `rust-version` 1.68 -> 1.95 (vstd needs it), `publish = false`, description, and `unexpected_cfgs` allowing `verus_keep_ghost`.  
+Agent's explanation (to be checked): Build configuration only: the `vstd` dependency `=0.0.0-2026-11-22-0344` (default features off, so still `no_std`; provides the `verus!` macro, which erases ghost code; no vstd function is called at run time), `rust-version` 1.68 -> 1.100 (the toolchain of Verus 0.2026.11.22), `publish = false`, the description, and `unexpected_cfgs` allowing `verus_keep_ghost`/`verus_only`. Observable to users as a higher MSRV and one more dependency; no change to the compiled code.  
 Configurations: files  
-Fingerprint: `b88ab8aea71d7ed6`  
+Fingerprint: `516a1251be194489`  
 Source: [Cargo.toml](../Cargo.toml)  
 Annotated: [Cargo.toml](../verus_fixed/itoa/Cargo.toml)
 
@@ -2178,14 +2178,14 @@ Annotated: [Cargo.toml](../verus_fixed/itoa/Cargo.toml)
  repository = "https://github.com/dtolnay/itoa"
 -rust-version = "1.68"
 +# Upstream: 1.68. The `vstd` crate (needed for the `verus!` macro) requires a recent toolchain.
-+rust-version = "1.95"
++rust-version = "1.100"
 +publish = false
  
 @@ -16,2 +18,5 @@
  no-panic = { version = "0.1", optional = true }
 +# Only for the normal (non-Verus) build: provides the `verus!` macro, which erases the ghost
 +# code. Verification uses the `verus` binary with its bundled vstd.
-+vstd = { version = "=0.0.0-2026-05-06-1803", default-features = false }
++vstd = { version = "=0.0.0-2026-11-22-0344", default-features = false }
  
 @@ -34 +39,4 @@
  
@@ -2199,10 +2199,10 @@ Annotated: [Cargo.toml](../verus_fixed/itoa/Cargo.toml)
 ### `const I128_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `40`, the length of `-170141183460469231731687303715884105728` (`i128::MIN`, with its sign). Used for `i128::MAX_STR_LEN` and the `i128` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #5`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `97752e2e98d22a3f`  
-Annotated: [src/lib.rs:221](../verus_fixed/itoa/src/lib.rs#L221)
+Annotated: [src/lib.rs:223](../verus_fixed/itoa/src/lib.rs#L223)
 
 ```diff
 +pub const I128_MAX_STR_LEN: usize = 40;
@@ -2211,10 +2211,10 @@ Annotated: [src/lib.rs:221](../verus_fixed/itoa/src/lib.rs#L221)
 ### `const I16_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `6`, the length of `-32768` (`i16::MIN`, with its sign). Used for `i16::MAX_STR_LEN` and the `i16` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #2`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `3d08b8275ae9d9f1`  
-Annotated: [src/lib.rs:215](../verus_fixed/itoa/src/lib.rs#L215)
+Annotated: [src/lib.rs:217](../verus_fixed/itoa/src/lib.rs#L217)
 
 ```diff
 +pub const I16_MAX_STR_LEN: usize = 6;
@@ -2223,10 +2223,10 @@ Annotated: [src/lib.rs:215](../verus_fixed/itoa/src/lib.rs#L215)
 ### `const I32_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `11`, the length of `-2147483648` (`i32::MIN`, with its sign). Used for `i32::MAX_STR_LEN` and the `i32` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #3`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `bdc5d1467d02dfbd`  
-Annotated: [src/lib.rs:217](../verus_fixed/itoa/src/lib.rs#L217)
+Annotated: [src/lib.rs:219](../verus_fixed/itoa/src/lib.rs#L219)
 
 ```diff
 +pub const I32_MAX_STR_LEN: usize = 11;
@@ -2235,10 +2235,10 @@ Annotated: [src/lib.rs:217](../verus_fixed/itoa/src/lib.rs#L217)
 ### `const I64_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `20`, the length of `-9223372036854775808` (`i64::MIN`, with its sign). Used for `i64::MAX_STR_LEN` and the `i64` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #4`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `c8dc1cf626e8f1f5`  
-Annotated: [src/lib.rs:219](../verus_fixed/itoa/src/lib.rs#L219)
+Annotated: [src/lib.rs:221](../verus_fixed/itoa/src/lib.rs#L221)
 
 ```diff
 +pub const I64_MAX_STR_LEN: usize = 20;
@@ -2247,10 +2247,10 @@ Annotated: [src/lib.rs:219](../verus_fixed/itoa/src/lib.rs#L219)
 ### `const I8_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `4`, the length of `-128` (`i8::MIN`, with its sign). Used for `i8::MAX_STR_LEN` and the `i8` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #1`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `fda0e877237595ed`  
-Annotated: [src/lib.rs:213](../verus_fixed/itoa/src/lib.rs#L213)
+Annotated: [src/lib.rs:215](../verus_fixed/itoa/src/lib.rs#L215)
 
 ```diff
 +pub const I8_MAX_STR_LEN: usize = 4;
@@ -2259,10 +2259,10 @@ Annotated: [src/lib.rs:213](../verus_fixed/itoa/src/lib.rs#L213)
 ### `const U128_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `39`, the length of `340282366920938463463374607431768211455` (`u128::MAX`). Used for `u128::MAX_STR_LEN` and the `u128` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #5`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `a813411d73ed9de4`  
-Annotated: [src/lib.rs:220](../verus_fixed/itoa/src/lib.rs#L220)
+Annotated: [src/lib.rs:222](../verus_fixed/itoa/src/lib.rs#L222)
 
 ```diff
 +pub const U128_MAX_STR_LEN: usize = 39;
@@ -2271,10 +2271,10 @@ Annotated: [src/lib.rs:220](../verus_fixed/itoa/src/lib.rs#L220)
 ### `const U16_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `5`, the length of `65535` (`u16::MAX`). Used for `u16::MAX_STR_LEN` and the `u16` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #2`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `4be45f7e9084265a`  
-Annotated: [src/lib.rs:214](../verus_fixed/itoa/src/lib.rs#L214)
+Annotated: [src/lib.rs:216](../verus_fixed/itoa/src/lib.rs#L216)
 
 ```diff
 +pub const U16_MAX_STR_LEN: usize = 5;
@@ -2283,10 +2283,10 @@ Annotated: [src/lib.rs:214](../verus_fixed/itoa/src/lib.rs#L214)
 ### `const U32_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `10`, the length of `4294967295` (`u32::MAX`). Used for `u32::MAX_STR_LEN` and the `u32` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #3`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `f8de60e2c7d30b3e`  
-Annotated: [src/lib.rs:216](../verus_fixed/itoa/src/lib.rs#L216)
+Annotated: [src/lib.rs:218](../verus_fixed/itoa/src/lib.rs#L218)
 
 ```diff
 +pub const U32_MAX_STR_LEN: usize = 10;
@@ -2295,10 +2295,10 @@ Annotated: [src/lib.rs:216](../verus_fixed/itoa/src/lib.rs#L216)
 ### `const U64_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `20`, the length of `18446744073709551615` (`u64::MAX`). Used for `u64::MAX_STR_LEN` and the `u64` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #4`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `091d6d578b5fcf9f`  
-Annotated: [src/lib.rs:218](../verus_fixed/itoa/src/lib.rs#L218)
+Annotated: [src/lib.rs:220](../verus_fixed/itoa/src/lib.rs#L220)
 
 ```diff
 +pub const U64_MAX_STR_LEN: usize = 20;
@@ -2307,10 +2307,10 @@ Annotated: [src/lib.rs:218](../verus_fixed/itoa/src/lib.rs#L218)
 ### `const U8_MAX_STR_LEN`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New plain constant in `private`, used for `MAX_STR_LEN` and the buffer array lengths (Verus crashes on an associated constant used as an array length and cannot evaluate `ilog10`). Its value equals upstream's formula, checked at compile time (`const _` asserts) and by the verified `lemma_max_str_len_*`.  
+Agent's explanation (to be checked): New plain constant `3`, the length of `255` (`u8::MAX`). Used for `u8::MAX_STR_LEN` and the `u8` buffer type. `pub` inside the private module `private`, so not part of the public API. Checked against upstream's formula at compile time (`const _ #1`). Needed because Verus cannot evaluate `ilog10`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `268dd37a4b331260`  
-Annotated: [src/lib.rs:212](../verus_fixed/itoa/src/lib.rs#L212)
+Annotated: [src/lib.rs:214](../verus_fixed/itoa/src/lib.rs#L214)
 
 ```diff
 +pub const U8_MAX_STR_LEN: usize = 3;
@@ -2319,7 +2319,7 @@ Annotated: [src/lib.rs:212](../verus_fixed/itoa/src/lib.rs#L212)
 ### `fn buffer_of`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New trusted function (`external_body`): upstream's two statements from `format` (`self.bytes.as_mut_ptr().cast::<I::Buffer>()`, `&mut *buf_ptr`), with `self.bytes` passed as `bytes`. check_trusted.py compares it with upstream.  
+Agent's explanation (to be checked): Upstream's two statements from `Buffer::format` (`let buf_ptr = self.bytes.as_mut_ptr().cast::<I::Buffer>();` and `unsafe { &mut *buf_ptr }`), moved verbatim into a `#[inline(always)]` function so that the rest of `format` is verified. A safe `pub(crate)` function, as the code was in the safe `format`: sound for every `I: Integer` because `Integer` is sealed and every `I::Buffer` is an array of at most 40 `MaybeUninit<u8>` (alignment 1), so the cast stays inside the 40-byte buffer.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `ed996cc07c8c9475`  
 Annotated: [src/trusted.rs:53-56](../verus_fixed/itoa/src/trusted.rs#L53-L56)
@@ -2337,7 +2337,7 @@ Annotated: [src/trusted.rs:53-56](../verus_fixed/itoa/src/trusted.rs#L53-L56)
 ### `fn get_unchecked`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New verified stand-in for `<[T]>::get_unchecked` (unspecified in vstd): indexes with a bounds check behind a branch to `unreachable_unchecked` that Verus proves dead, so the optimizer drops the check.  
+Agent's explanation (to be checked): Verified stand-in for upstream's `<[T]>::get_unchecked(index)` on `DECIMAL_PAIRS.0`. For `index < N` it returns `&array[index]`, the same element; for `index >= N` it hits `unreachable_unchecked`, so the bounds check is optimized away. Out of bounds is UB in both versions; Verus proves it never happens (`requires index < N` at every call). (Verus 0.2026.11.22 now specifies `get_unchecked` directly; the stand-in was kept.)  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `604a1d7269e57237`  
 Annotated: [src/std_ext.rs:20-31](../verus_fixed/itoa/src/std_ext.rs#L20-L31)
@@ -2354,7 +2354,7 @@ Annotated: [src/std_ext.rs:20-31](../verus_fixed/itoa/src/std_ext.rs#L20-L31)
 ### `fn write_unchecked`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New verified stand-in for `get_unchecked_mut(i).write(v)`; same scheme as `get_unchecked`.  
+Agent's explanation (to be checked): Verified stand-in for upstream's `buf.get_unchecked_mut(index).write(value)`. For `index < N` it assigns `MaybeUninit::new(value)` to `array[index]`, which is what `MaybeUninit::write` does (itoa discards the returned reference); for `index >= N` it hits `unreachable_unchecked`, so the bounds check is optimized away. Out of bounds is UB in both versions; Verus proves it never happens (`requires index < N` at every call).  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `6f5c7454c511236e`  
 Annotated: [src/std_ext.rs:37-53](../verus_fixed/itoa/src/std_ext.rs#L37-L53)
@@ -2371,10 +2371,10 @@ Annotated: [src/std_ext.rs:37-53](../verus_fixed/itoa/src/std_ext.rs#L37-L53)
 ### `impl Signed for i128`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New impl of the private trait `Signed` (one per signed type).  
+Agent's explanation (to be checked): New impl of the crate-private trait `Signed` for `i128` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i128 :: fn fmt`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `89360ff533b5f562`  
-Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in `impl_Signed!`, invoked at [src/lib.rs:1160](../verus_fixed/itoa/src/lib.rs#L1160)
+Annotated: [src/lib.rs:1117-1153](../verus_fixed/itoa/src/lib.rs#L1117-L1153) in `impl_Signed!`, invoked at [src/lib.rs:1162](../verus_fixed/itoa/src/lib.rs#L1162)
 
 ```diff
 +impl Signed for i128 {
@@ -2392,10 +2392,10 @@ Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in
 ### `impl Signed for i128 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u128 + 1 } else { self as u128 }`: exact for every value, including `i128::MIN` (-(MIN + 1) = MAX, cast to `u128`, plus 1 = 2^127); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i128` `write` entry for why the positions and offset equal upstream's.  
 Configurations: --no-default-features  
 Fingerprint: `24c94e1faa1ad425`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1160](../verus_fixed/itoa/src/lib.rs#L1160)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1162](../verus_fixed/itoa/src/lib.rs#L1162)
 
 ```diff
 +#[inline]
@@ -2411,10 +2411,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `impl Signed for i128 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u128 + 1 } else { self as u128 }`: exact for every value, including `i128::MIN` (-(MIN + 1) = MAX, cast to `u128`, plus 1 = 2^127); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i128` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains.  
 Configurations: --all-features  
 Fingerprint: `2f46e31a5f45741d`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1160](../verus_fixed/itoa/src/lib.rs#L1160)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1162](../verus_fixed/itoa/src/lib.rs#L1162)
 
 ```diff
 +#[inline]
@@ -2459,10 +2459,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `impl Signed for i16`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New impl of the private trait `Signed` (one per signed type).  
+Agent's explanation (to be checked): New impl of the crate-private trait `Signed` for `i16` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i16 :: fn fmt`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `482172496ddb2da0`  
-Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in `impl_Signed!`, invoked at [src/lib.rs:1157](../verus_fixed/itoa/src/lib.rs#L1157)
+Annotated: [src/lib.rs:1117-1153](../verus_fixed/itoa/src/lib.rs#L1117-L1153) in `impl_Signed!`, invoked at [src/lib.rs:1159](../verus_fixed/itoa/src/lib.rs#L1159)
 
 ```diff
 +impl Signed for i16 {
@@ -2480,10 +2480,10 @@ Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in
 ### `impl Signed for i16 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u16 + 1 } else { self as u16 }`: exact for every value, including `i16::MIN` (-(MIN + 1) = MAX, cast to `u16`, plus 1 = 2^15); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i16` `write` entry for why the positions and offset equal upstream's.  
 Configurations: --no-default-features  
 Fingerprint: `fcd54e1bff87aaea`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1157](../verus_fixed/itoa/src/lib.rs#L1157)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1159](../verus_fixed/itoa/src/lib.rs#L1159)
 
 ```diff
 +#[inline]
@@ -2499,10 +2499,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `impl Signed for i16 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u16 + 1 } else { self as u16 }`: exact for every value, including `i16::MIN` (-(MIN + 1) = MAX, cast to `u16`, plus 1 = 2^15); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i16` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains.  
 Configurations: --all-features  
 Fingerprint: `7083c52f479e30ad`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1157](../verus_fixed/itoa/src/lib.rs#L1157)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1159](../verus_fixed/itoa/src/lib.rs#L1159)
 
 ```diff
 +#[inline]
@@ -2547,10 +2547,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `impl Signed for i32`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New impl of the private trait `Signed` (one per signed type).  
+Agent's explanation (to be checked): New impl of the crate-private trait `Signed` for `i32` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i32 :: fn fmt`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `4f63850df89650df`  
-Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in `impl_Signed!`, invoked at [src/lib.rs:1158](../verus_fixed/itoa/src/lib.rs#L1158)
+Annotated: [src/lib.rs:1117-1153](../verus_fixed/itoa/src/lib.rs#L1117-L1153) in `impl_Signed!`, invoked at [src/lib.rs:1160](../verus_fixed/itoa/src/lib.rs#L1160)
 
 ```diff
 +impl Signed for i32 {
@@ -2568,10 +2568,10 @@ Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in
 ### `impl Signed for i32 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u32 + 1 } else { self as u32 }`: exact for every value, including `i32::MIN` (-(MIN + 1) = MAX, cast to `u32`, plus 1 = 2^31); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i32` `write` entry for why the positions and offset equal upstream's.  
 Configurations: --no-default-features  
 Fingerprint: `25a532f988a319fd`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1158](../verus_fixed/itoa/src/lib.rs#L1158)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1160](../verus_fixed/itoa/src/lib.rs#L1160)
 
 ```diff
 +#[inline]
@@ -2587,10 +2587,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `impl Signed for i32 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u32 + 1 } else { self as u32 }`: exact for every value, including `i32::MIN` (-(MIN + 1) = MAX, cast to `u32`, plus 1 = 2^31); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i32` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains.  
 Configurations: --all-features  
 Fingerprint: `a994aea1815a4249`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1158](../verus_fixed/itoa/src/lib.rs#L1158)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1160](../verus_fixed/itoa/src/lib.rs#L1160)
 
 ```diff
 +#[inline]
@@ -2635,10 +2635,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `impl Signed for i64`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New impl of the private trait `Signed` (one per signed type).  
+Agent's explanation (to be checked): New impl of the crate-private trait `Signed` for `i64` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i64 :: fn fmt`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `f1b8cec8515df1e5`  
-Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in `impl_Signed!`, invoked at [src/lib.rs:1159](../verus_fixed/itoa/src/lib.rs#L1159)
+Annotated: [src/lib.rs:1117-1153](../verus_fixed/itoa/src/lib.rs#L1117-L1153) in `impl_Signed!`, invoked at [src/lib.rs:1161](../verus_fixed/itoa/src/lib.rs#L1161)
 
 ```diff
 +impl Signed for i64 {
@@ -2656,10 +2656,10 @@ Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in
 ### `impl Signed for i64 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u64 + 1 } else { self as u64 }`: exact for every value, including `i64::MIN` (-(MIN + 1) = MAX, cast to `u64`, plus 1 = 2^63); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i64` `write` entry for why the positions and offset equal upstream's.  
 Configurations: --no-default-features  
 Fingerprint: `a9ac3aa1490672e8`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1159](../verus_fixed/itoa/src/lib.rs#L1159)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1161](../verus_fixed/itoa/src/lib.rs#L1161)
 
 ```diff
 +#[inline]
@@ -2675,10 +2675,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `impl Signed for i64 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u64 + 1 } else { self as u64 }`: exact for every value, including `i64::MIN` (-(MIN + 1) = MAX, cast to `u64`, plus 1 = 2^63); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i64` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains.  
 Configurations: --all-features  
 Fingerprint: `7be8956895b0bf30`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1159](../verus_fixed/itoa/src/lib.rs#L1159)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1161](../verus_fixed/itoa/src/lib.rs#L1161)
 
 ```diff
 +#[inline]
@@ -2723,10 +2723,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `impl Signed for i8`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New impl of the private trait `Signed` (one per signed type).  
+Agent's explanation (to be checked): New impl of the crate-private trait `Signed` for `i8` (from `impl_Signed!`). Its only method is reviewed in `impl Signed for i8 :: fn fmt`.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `f0c316d39440312d`  
-Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in `impl_Signed!`, invoked at [src/lib.rs:1156](../verus_fixed/itoa/src/lib.rs#L1156)
+Annotated: [src/lib.rs:1117-1153](../verus_fixed/itoa/src/lib.rs#L1117-L1153) in `impl_Signed!`, invoked at [src/lib.rs:1158](../verus_fixed/itoa/src/lib.rs#L1158)
 
 ```diff
 +impl Signed for i8 {
@@ -2744,10 +2744,10 @@ Annotated: [src/lib.rs:1115-1151](../verus_fixed/itoa/src/lib.rs#L1115-L1151) in
 ### `impl Signed for i8 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u8 + 1 } else { self as u8 }`: exact for every value, including `i8::MIN` (-(MIN + 1) = MAX, cast to `u8`, plus 1 = 2^7); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i8` `write` entry for why the positions and offset equal upstream's.  
 Configurations: --no-default-features  
 Fingerprint: `50dce60bdf8b2dfc`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1156](../verus_fixed/itoa/src/lib.rs#L1156)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1158](../verus_fixed/itoa/src/lib.rs#L1158)
 
 ```diff
 +#[inline]
@@ -2763,10 +2763,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `impl Signed for i8 :: fn fmt`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's signed formatting: `unsigned_abs()` as an in-range expression (`(-(self + 1)) as uN + 1`; the first pass reports that LLVM emits it as an alias of `unsigned_abs` for i8, i64, i128), `Unsigned::fmt` on the whole buffer, then `'-'` (45) via `write_unchecked`. Verified.  
+Agent's explanation (to be checked): Upstream's signed formatting from `write`. `self.unsigned_abs()` (unspecified in vstd) becomes `if self < 0 { (-(self + 1)) as u8 + 1 } else { self as u8 }`: exact for every value, including `i8::MIN` (-(MIN + 1) = MAX, cast to `u8`, plus 1 = 2^7); no step can overflow, so debug builds cannot panic either. It then calls `Unsigned::fmt` on the whole buffer and, if negative, writes 45 (`b'-'`) at `offset - 1` with the stand-in `write_unchecked`; see the `i8` `write` entry for why the positions and offset equal upstream's. Under `--all-features` it carries its own `no_panic` wrapper (the attribute is new on this function; upstream's `write`, where this code was, has one too): the no-panic build still links, so no panic path remains.  
 Configurations: --all-features  
 Fingerprint: `1f9ba26f3ea5dd0e`  
-Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in `impl_Signed!`, invoked at [src/lib.rs:1156](../verus_fixed/itoa/src/lib.rs#L1156)
+Annotated: [src/lib.rs:1124-1152](../verus_fixed/itoa/src/lib.rs#L1124-L1152) in `impl_Signed!`, invoked at [src/lib.rs:1158](../verus_fixed/itoa/src/lib.rs#L1158)
 
 ```diff
 +#[inline]
@@ -2809,10 +2809,10 @@ Annotated: [src/lib.rs:1122-1150](../verus_fixed/itoa/src/lib.rs#L1122-L1150) in
 ### `trait Signed`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New private trait for the signed formatting (upstream had it inline in `write`).  
+Agent's explanation (to be checked): New crate-private trait (not public API) with one method, `fmt`: the signed formatting that upstream had inline in `write`, moved out so it is verified as its own function (first pass). Doc comment only besides the signature.  
 Configurations: --no-default-features, --all-features  
 Fingerprint: `8609eb14f3d1f7e6`  
-Annotated: [src/lib.rs:1096-1110](../verus_fixed/itoa/src/lib.rs#L1096-L1110)
+Annotated: [src/lib.rs:1098-1112](../verus_fixed/itoa/src/lib.rs#L1098-L1112)
 
 ```diff
 +trait Signed: Integer {
@@ -2827,9 +2827,9 @@ Annotated: [src/lib.rs:1096-1110](../verus_fixed/itoa/src/lib.rs#L1096-L1110)
 ### `file rust-toolchain.toml`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): New: pins rustc 1.95.0, the toolchain of the bundled Verus.  
+Agent's explanation (to be checked): New file: pins rustc 1.100.0, the toolchain Verus 0.2026.11.22 uses, for normal builds of the annotated crate. Build configuration only.  
 Configurations: files  
-Fingerprint: `a0b175a09ecfd5e8`  
+Fingerprint: `3d205b47623b7385`  
 Annotated: [rust-toolchain.toml](../verus_fixed/itoa/rust-toolchain.toml)
 
 ```diff
@@ -2837,7 +2837,7 @@ Annotated: [rust-toolchain.toml](../verus_fixed/itoa/rust-toolchain.toml)
 +++ annotated
 @@ -0,0 +1,4 @@
 +[toolchain]
-+channel = "1.95.0"
++channel = "1.100.0"
 +components = ["rustc", "rust-std", "cargo", "rustfmt"]
 +
 ```
@@ -2847,16 +2847,16 @@ Annotated: [rust-toolchain.toml](../verus_fixed/itoa/rust-toolchain.toml)
 ### `trust more often than upstream: unsafe { hint::unreachable_unchecked() };`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream has this line once, in `format`; it is still there (src/lib.rs). The two copies in std_ext.rs are the out-of-bounds branches of the verified stand-ins `get_unchecked` and `write_unchecked`. Verus specifies `unreachable_unchecked` with `requires false` and proves all three unreachable: `index < N` is the stand-ins' precondition, checked at every call.  
+Agent's explanation (to be checked): 3 occurrences, upstream has 1. Upstream's, in `format` (lib.rs:179), is unchanged and now verified dead. The two in std_ext.rs (28, 50) are the out-of-bounds branches of `get_unchecked` and `write_unchecked`. vstd specifies `unreachable_unchecked` with `requires false`, so Verus proves each one unreachable at every call.  
 Configurations: source  
 Fingerprint: `cd8dbf1dc48076cd`  
 Occurrences: 3 here; upstream has 1  
-Annotated: [src/lib.rs:178](../verus_fixed/itoa/src/lib.rs#L178), [src/std_ext.rs:28](../verus_fixed/itoa/src/std_ext.rs#L28), [src/std_ext.rs:50](../verus_fixed/itoa/src/std_ext.rs#L50)
+Annotated: [src/lib.rs:179](../verus_fixed/itoa/src/lib.rs#L179), [src/std_ext.rs:28](../verus_fixed/itoa/src/std_ext.rs#L28), [src/std_ext.rs:50](../verus_fixed/itoa/src/std_ext.rs#L50)
 
 ### `trust src/lib.rs: #[cfg(verus_keep_ghost)] mod verified_examples;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Verified example clients, compiled only under Verus; nothing calls them.  
+Agent's explanation (to be checked): Ghost-only module of verified examples (e.g. `format(128u64)` is `"128"`), compiled only under Verus. Normal builds do not contain it, and it makes nothing trusted.  
 Configurations: source  
 Fingerprint: `06dc29a0525a0057`  
 Annotated: [src/lib.rs:74](../verus_fixed/itoa/src/lib.rs#L74)
@@ -2864,7 +2864,7 @@ Annotated: [src/lib.rs:74](../verus_fixed/itoa/src/lib.rs#L74)
 ### `trust src/lib.rs: #[cfg(verus_keep_ghost)] pub use crate::human_spec::*;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): Under Verus only, re-exports the developer's spec functions at the crate root, where the developer defined them. Compiled out of normal builds, so the public API is unchanged; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `918cfda75fb35d34`  
 Annotated: [src/lib.rs:79](../verus_fixed/itoa/src/lib.rs#L79)
@@ -2872,15 +2872,15 @@ Annotated: [src/lib.rs:79](../verus_fixed/itoa/src/lib.rs#L79)
 ### `trust src/lib.rs: #[cfg(verus_keep_ghost)] use crate::human_spec::*;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`crate::human_spec::*`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `d17e99076ebabb9c`  
-Annotated: [src/lib.rs:204](../verus_fixed/itoa/src/lib.rs#L204)
+Annotated: [src/lib.rs:205](../verus_fixed/itoa/src/lib.rs#L205)
 
 ### `trust src/lib.rs: #[cfg(verus_keep_ghost)] use crate::spec::*;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`crate::spec::*`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `12bffc5947115fd4`  
 Annotated: [src/lib.rs:81](../verus_fixed/itoa/src/lib.rs#L81)
@@ -2888,7 +2888,7 @@ Annotated: [src/lib.rs:81](../verus_fixed/itoa/src/lib.rs#L81)
 ### `trust src/lib.rs: #[cfg(verus_keep_ghost)] use crate::spec_equiv::*;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`crate::spec_equiv::*`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `8271d2ff64c10ce6`  
 Annotated: [src/lib.rs:83](../verus_fixed/itoa/src/lib.rs#L83)
@@ -2896,15 +2896,15 @@ Annotated: [src/lib.rs:83](../verus_fixed/itoa/src/lib.rs#L83)
 ### `trust src/lib.rs: #[cfg(verus_keep_ghost)] use vstd::prelude::*;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::prelude::*`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `f35d100275f3db5c`  
-Annotated: [src/lib.rs:206](../verus_fixed/itoa/src/lib.rs#L206)
+Annotated: [src/lib.rs:207](../verus_fixed/itoa/src/lib.rs#L207)
 
 ### `trust src/lib.rs: #[cfg(verus_keep_ghost)] use vstd::utf8::is_ascii_chars_encode_utf8;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::utf8::is_ascii_chars_encode_utf8`) used only by specifications and proofs in `src/lib.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `8bec49eadc8bd113`  
 Annotated: [src/lib.rs:92](../verus_fixed/itoa/src/lib.rs#L92)
@@ -2912,7 +2912,7 @@ Annotated: [src/lib.rs:92](../verus_fixed/itoa/src/lib.rs#L92)
 ### `trust src/spec.rs: #[cfg(verus_keep_ghost)] use vstd::arithmetic::div_mod::{`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::arithmetic::div_mod::`...) used only by specifications and proofs in `src/spec.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `3dcfb6e6667c0a05`  
 Annotated: [src/spec.rs:8](../verus_fixed/itoa/src/spec.rs#L8)
@@ -2920,7 +2920,7 @@ Annotated: [src/spec.rs:8](../verus_fixed/itoa/src/spec.rs#L8)
 ### `trust src/spec.rs: #[cfg(verus_keep_ghost)] use vstd::arithmetic::mul::lemma_mul_inequality;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::arithmetic::mul::lemma_mul_inequality`) used only by specifications and proofs in `src/spec.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `229ed1428cab8b8e`  
 Annotated: [src/spec.rs:14](../verus_fixed/itoa/src/spec.rs#L14)
@@ -2928,7 +2928,7 @@ Annotated: [src/spec.rs:14](../verus_fixed/itoa/src/spec.rs#L14)
 ### `trust src/spec.rs: #[cfg(verus_keep_ghost)] use vstd::raw_ptr::MemContents;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::raw_ptr::MemContents`) used only by specifications and proofs in `src/spec.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `ca6fe0602684acbd`  
 Annotated: [src/spec.rs:17](../verus_fixed/itoa/src/spec.rs#L17)
@@ -2936,7 +2936,7 @@ Annotated: [src/spec.rs:17](../verus_fixed/itoa/src/spec.rs#L17)
 ### `trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use crate::trusted::suffix_bytes;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`crate::trusted::suffix_bytes`) used only by specifications and proofs in `src/spec_equiv.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `7d469d9f57bc8b02`  
 Annotated: [src/spec_equiv.rs:11](../verus_fixed/itoa/src/spec_equiv.rs#L11)
@@ -2944,7 +2944,7 @@ Annotated: [src/spec_equiv.rs:11](../verus_fixed/itoa/src/spec_equiv.rs#L11)
 ### `trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use vstd::raw_ptr::MemContents;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::raw_ptr::MemContents`) used only by specifications and proofs in `src/spec_equiv.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `0c174de43f41e74d`  
 Annotated: [src/spec_equiv.rs:15](../verus_fixed/itoa/src/spec_equiv.rs#L15)
@@ -2952,7 +2952,7 @@ Annotated: [src/spec_equiv.rs:15](../verus_fixed/itoa/src/spec_equiv.rs#L15)
 ### `trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use vstd::string::{is_ascii, StringSliceAdditionalSpecFns};`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::string::{is_ascii, StringSliceAdditionalSpecFns}`) used only by specifications and proofs in `src/spec_equiv.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `f33ca93c853761a6`  
 Annotated: [src/spec_equiv.rs:17](../verus_fixed/itoa/src/spec_equiv.rs#L17)
@@ -2960,7 +2960,7 @@ Annotated: [src/spec_equiv.rs:17](../verus_fixed/itoa/src/spec_equiv.rs#L17)
 ### `trust src/spec_equiv.rs: #[cfg(verus_keep_ghost)] use vstd::utf8::{`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::utf8::`...) used only by specifications and proofs in `src/spec_equiv.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `4fdaac58c060cd79`  
 Annotated: [src/spec_equiv.rs:19](../verus_fixed/itoa/src/spec_equiv.rs#L19)
@@ -2968,7 +2968,7 @@ Annotated: [src/spec_equiv.rs:19](../verus_fixed/itoa/src/spec_equiv.rs#L19)
 ### `trust src/std_ext.rs: #[cfg(verus_keep_ghost)] use vstd::raw_ptr::MemContents;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::raw_ptr::MemContents`) used only by specifications and proofs in `src/std_ext.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `d2e01619dd4990cc`  
 Annotated: [src/std_ext.rs:13](../verus_fixed/itoa/src/std_ext.rs#L13)
@@ -2976,7 +2976,7 @@ Annotated: [src/std_ext.rs:13](../verus_fixed/itoa/src/std_ext.rs#L13)
 ### `trust src/trusted.rs: #[cfg(verus_keep_ghost)] use crate::human_spec::initialized_ascii_suffix;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`crate::human_spec::initialized_ascii_suffix`) used only by specifications and proofs in `src/trusted.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `cb03db42fd001fca`  
 Annotated: [src/trusted.rs:28](../verus_fixed/itoa/src/trusted.rs#L28)
@@ -2984,7 +2984,7 @@ Annotated: [src/trusted.rs:28](../verus_fixed/itoa/src/trusted.rs#L28)
 ### `trust src/trusted.rs: #[cfg(verus_keep_ghost)] use vstd::string::StringSliceAdditionalSpecFns;`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Import of ghost-only items (spec functions, lemmas, vstd spec traits), present only when Verus runs; a normal build does not need it.  
+Agent's explanation (to be checked): `#[cfg(verus_keep_ghost)]` import of ghost items (`vstd::string::StringSliceAdditionalSpecFns`) used only by specifications and proofs in `src/trusted.rs`. Compiled only under Verus, absent from normal builds; an import makes nothing trusted.  
 Configurations: source  
 Fingerprint: `897ecbd04a025f1a`  
 Annotated: [src/trusted.rs:36](../verus_fixed/itoa/src/trusted.rs#L36)
@@ -2992,7 +2992,7 @@ Annotated: [src/trusted.rs:36](../verus_fixed/itoa/src/trusted.rs#L36)
 ### `trust src/trusted.rs: #[verifier::external_body] pub(crate) fn buffer_of<I: Integer>(bytes: &mut [MaybeUninit<u8>; private::I128_MAX_STR_LEN]) -> &mut I::Buffer {`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Trusted item T1 (raw-pointer cast); see SPEC_REVIEW.md.  
+Agent's explanation (to be checked): Trusted (T1): Verus does not check the body, which is upstream's cast from `format` (2 statements; check_trusted.py checks it). No `ensures`, so Verus assumes nothing about the returned buffer; `write`'s contract holds for any buffer. Obligation, by inspection: every `I::Buffer` is an array of at most 40 `MaybeUninit<u8>` (Verus proves `I::MAX_STR_LEN <= 40` in `Integer::lemma_max_str_len`), so the cast stays inside the buffer.  
 Configurations: source  
 Fingerprint: `421565cfe33b89c4`  
 Annotated: [src/trusted.rs:51](../verus_fixed/itoa/src/trusted.rs#L51)
@@ -3000,7 +3000,7 @@ Annotated: [src/trusted.rs:51](../verus_fixed/itoa/src/trusted.rs#L51)
 ### `trust src/trusted.rs: #[verifier::external_body] pub(crate) unsafe fn slice_buffer_to_str(buf: &[MaybeUninit<u8>], offset: usize) -> (result: &str)`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Trusted item T3; contract: the developer's precondition and `result.spec_bytes() == suffix_bytes(buf@, offset)`.  
+Agent's explanation (to be checked): Trusted (T3): Verus does not check the body (upstream's, verbatim; check_trusted.py checks it) and assumes its contract: `requires offset <= buf.len()` and the developer's `initialized_ascii_suffix(buf, offset)`, `ensures result.spec_bytes() == suffix_bytes(buf@, offset)` (the string is the initialized bytes `buf[offset..]`). The contract matches the body: `get_unchecked(offset..)` needs `offset <= len`, reading the elements as `u8` needs them initialized, and `from_utf8_unchecked` needs valid UTF-8, which ASCII is. Verus proves the precondition at every call (the `write` methods).  
 Configurations: source  
 Fingerprint: `36f4e1450c70eabf`  
 Annotated: [src/trusted.rs:68](../verus_fixed/itoa/src/trusted.rs#L68)
@@ -3008,7 +3008,7 @@ Annotated: [src/trusted.rs:68](../verus_fixed/itoa/src/trusted.rs#L68)
 ### `trust src/trusted.rs: pub(crate) unsafe fn slice_buffer_to_str(buf: &[MaybeUninit<u8>], offset: usize) -> (result: &str)`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): The signature line of T3 (upstream's, plus `pub(crate)` and a named result for the contract).  
+Agent's explanation (to be checked): The signature line of `slice_buffer_to_str`: upstream's `unsafe fn`, now `pub(crate)` (moved to `trusted.rs`) and naming its result `(result: &str)` for the `ensures`, which the `verus!` macro erases. Not a new `unsafe`: upstream's function is `unsafe fn` too.  
 Configurations: source  
 Fingerprint: `a907e8ec33aedd06`  
 Annotated: [src/trusted.rs:69](../verus_fixed/itoa/src/trusted.rs#L69)
@@ -3016,7 +3016,7 @@ Annotated: [src/trusted.rs:69](../verus_fixed/itoa/src/trusted.rs#L69)
 ### `trust src/trusted.rs: unsafe { &mut *buf_ptr }`
 
 Review: **approved by Shawn**  
-Agent's explanation (to be checked): Upstream's cast, now in `buffer_of` (T1).  
+Agent's explanation (to be checked): Upstream's `unsafe { &mut *buf_ptr }` from `format` (where it was the argument of `i.write(...)`), now the last expression of `buffer_of`. Same count overall: one, as upstream.  
 Configurations: source  
 Fingerprint: `807f06ee043a03c5`  
 Annotated: [src/trusted.rs:55](../verus_fixed/itoa/src/trusted.rs#L55)

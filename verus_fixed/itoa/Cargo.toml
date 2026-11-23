@@ -11,14 +11,14 @@ keywords = ["integer"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/dtolnay/itoa"
 # Upstream: 1.68. The `vstd` crate (needed for the `verus!` macro) requires a recent toolchain.
-rust-version = "1.95"
+rust-version = "1.100"
 publish = false
 
 [dependencies]
 no-panic = { version = "0.1", optional = true }
 # Only for the normal (non-Verus) build: provides the `verus!` macro, which erases the ghost
 # code. Verification uses the `verus` binary with its bundled vstd.
-vstd = { version = "=0.0.0-2026-05-06-1803", default-features = false }
+vstd = { version = "=0.0.0-2026-11-22-0344", default-features = false }
 
 [target.'cfg(not(miri))'.dev-dependencies]
 criterion = { version = "0.8", default-features = false }
